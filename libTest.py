@@ -1,4 +1,4 @@
-from lib import *
+from src_lib import *
 from data import *
 import unittest
 
