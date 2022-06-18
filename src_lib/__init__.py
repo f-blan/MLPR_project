@@ -5,3 +5,6 @@ from .utils import *
 from .MVG_Model import *
 from .MVG_functionals import *
 from .KCV import *
+from .LR_Model import *
+from .Discrete_Model import *
+from .BD_wrapper import *

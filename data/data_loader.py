@@ -3,6 +3,59 @@ import numpy as np
 
 import sklearn.datasets
 
+import json
+
+
+def load_data_comm():
+
+    lInf = []
+
+    f=open('data/inferno.txt', encoding="ISO-8859-1")
+
+    for line in f:
+        lInf.append(line.strip())
+    f.close()
+
+    lPur = []
+
+    f=open('data/purgatorio.txt', encoding="ISO-8859-1")
+
+    for line in f:
+        lPur.append(line.strip())
+    f.close()
+
+    lPar = []
+
+    f=open('data/paradiso.txt', encoding="ISO-8859-1")
+
+    for line in f:
+        lPar.append(line.strip())
+    f.close()
+    
+    return lInf, lPur, lPar
+
+def split_data_comm(l, n):
+
+    lTrain, lTest = [], []
+    for i in range(len(l)):
+        if i % n == 0:
+            lTest.append(l[i])
+        else:
+            lTrain.append(l[i])
+            
+    return lTrain, lTest
+
+def save_gmm(gmm, filename):
+    gmmJson = [(i, j.tolist(), k.tolist()) for i, j, k in gmm]
+    with open(filename, 'w') as f:
+        json.dump(gmmJson, f)
+    
+def load_gmm(filename):
+    with open(filename, 'r') as f:
+        gmm = json.load(f)
+    return [(i, numpy.asarray(j), numpy.asarray(k)) for i, j, k in gmm]
+
+
 def load_iris():
     D, L = sklearn.datasets.load_iris()['data'].T, sklearn.datasets.load_iris()['target']
     return D, L
