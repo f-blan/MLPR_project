@@ -148,7 +148,7 @@ def estimateModel(hlTercets, eps = 0.1):
     
 
 class Discrete_Model(Model):
-    def __init__(self, n_classes, eps:float, prior: np.ndarray = -np.ones(1), label_translate= {}):
+    def __init__(self, n_classes: int, eps:float, prior: np.ndarray = -np.ones(1), label_translate= {}):
         super().__init__(n_classes,prior)
         self.eps = eps
         self.label_translate = label_translate
@@ -159,7 +159,7 @@ class Discrete_Model(Model):
 
         pass
 
-    def validate(self, D, L):
+    def predict(self, D, L):
         llm = compute_logLikelihoodMatrix(
                 self.freqs,
                 self.dict,
@@ -174,7 +174,7 @@ class Discrete_Model(Model):
         return acc, preds, predictions
 
     def getConfusionMatrix(self, D, L):
-        _, predL, __ = self.validate(D, L)
+        _, predL, __ = self.predict(D, L)
 
         
         m = np.zeros((self.n_classes, self.n_classes))

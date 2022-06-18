@@ -3,6 +3,7 @@ from data import *
 import unittest
 from src_lib.GMM_Model import *
 from src_lib.SVM_Model import Kernel, SVML_Model, SVMNL_Model
+from src_lib.BD_wrapper import *
 
 from data.data_loader import * 
 
@@ -330,6 +331,119 @@ class LibTest():
 
         print(m)
 
+    def test_BD_Opt(self):
+        DTR, DTE, LTE, _ = get_Inf_Par()
+
+        C1 = np.array(
+        [[0,1],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.5)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(m)
+
+        C1 = np.array(
+        [[0,1],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.8)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(m)
+
+        C1 = np.array(
+        [[0,10],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.5)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(m)
+
+        C1 = np.array(
+        [[0,1],
+        [10,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.8)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(m)
+
+    def test_BD_risks(self):
+        DTR, DTE, LTE, _ = get_Inf_Par()
+
+        C1 = np.array(
+        [[0,1],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.5)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(f"risk : {b_d1.get_risk(m)}")
+        print(f"norm risk : {b_d1.get_norm_risk(m)}")
+        print(f"best thresholds: {b_d1.compute_best_threshold(DTE, LTE)}")
+
+        C1 = np.array(
+        [[0,1],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.8)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(f"risk : {b_d1.get_risk(m)}")
+        print(f"norm risk : {b_d1.get_norm_risk(m)}")
+        print(f"best thresholds: {b_d1.compute_best_threshold(DTE, LTE)}")
+
+
+        C1 = np.array(
+        [[0,10],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.5)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(f"risk : {b_d1.get_risk(m)}")
+        print(f"norm risk : {b_d1.get_norm_risk(m)}")
+        print(f"best thresholds: {b_d1.compute_best_threshold(DTE, LTE)}")
+
+
+        C1 = np.array(
+        [[0,1],
+        [10,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.8)
+        b_d1.train(DTR, LTE)
+        m = b_d1.computeConfusionMatrix(DTE, LTE)
+        print(f"risk : {b_d1.get_risk(m)}")
+        print(f"norm risk : {b_d1.get_norm_risk(m)}")
+        print(f"best thresholds: {b_d1.compute_best_threshold(DTE, LTE)}")
+    
+    def test_ROC(self):
+        DTR, DTE, LTE, _ = get_Inf_Par()
+
+        C1 = np.array(
+        [[0,1],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.5)
+        b_d1.train(DTR, LTE)
+        b_d1.plot_ROC_over_thresholds(DTE,LTE)
+        #m = b_d1.computeConfusionMatrix(DTE, LTE)
+    
+    def test_BE_plot(self):
+        DTR, DTE, LTE, _ = get_Inf_Par()
+
+        C1 = np.array(
+        [[0,1],
+        [1,0]]
+        )
+        b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.5)
+        b_d1.train(DTR, LTE)
+        b_d1.plot_Bayes_errors(DTE, LTE)
+
+
+
         
         
 
@@ -361,7 +475,11 @@ if __name__ == "__main__":
     #testClass.test_GMM_LBG_Classify_D()
     #testClass.test_GMM_LBG_Classify_T()
     #testClass.test_BD_simple()
-    testClass.test_CM_comm()
+    #testClass.test_CM_comm()
+    #testClass.test_BD_Opt()
+    #testClass.test_BD_risks()
+    #testClass.test_ROC()
+    testClass.test_BE_plot()
 
 
 
