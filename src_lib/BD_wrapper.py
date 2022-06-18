@@ -138,14 +138,19 @@ class BD_Wrapper:
         for idx, p in enumerate(priorLogOdds):
             effectiveP = 1/(1+np.exp(-p))
             th = -np.log((effectiveP)/(1-effectiveP))
-            m = self.get_matrix_from_threshold(labels, llrs, th=th)
+            
             self.prior = np.array([(1-effectiveP), effectiveP])
+            m = self.get_matrix_from_threshold(labels, llrs, th=th)
+            
 
             DCFs.append(self.get_norm_risk(m))
             minDCFs.append(self.compute_best_threshold(D,L)[0])
 
         self.prior = old_prior        
 
+        DCFs.reverse()
+        
+        minDCFs.reverse()
         plt.plot(priorLogOdds, DCFs, label='DCF', color= 'r')
 
         plt.plot(priorLogOdds, minDCFs, label='minDCF', color= 'b')
