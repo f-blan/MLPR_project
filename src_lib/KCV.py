@@ -68,3 +68,7 @@ class KCV:
             tot_s += LTE.shape[0]
         
         return tot_c/tot_s
+    
+
+    def find_best_par(self ):
+        pass

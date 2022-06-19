@@ -441,6 +441,16 @@ class LibTest():
         b_d1 = BD_Wrapper("discrete", 2, C1, e_prior=0.5)
         b_d1.train(DTR, LTE)
         b_d1.plot_Bayes_errors(DTE, LTE)
+    
+    def test_Gauss_Preproc(self):
+        p = Gaussianize()
+
+        g,l = p.learn(self.DTR, self.LTR)
+
+        myHistogram(g, 3, l)
+
+
+
 
 
 
@@ -479,7 +489,8 @@ if __name__ == "__main__":
     #testClass.test_BD_Opt()
     #testClass.test_BD_risks()
     #testClass.test_ROC()
-    testClass.test_BE_plot()
+    #testClass.test_BE_plot()
+    testClass.test_Gauss_Preproc()
 
 
 

@@ -11,6 +11,13 @@ def myHistogram(data: np.ndarray,n_labels:int,labels:np.ndarray, bins: int=20):
             plt.hist(data[i, labels == j],bins=bins, density=True, color=colors[j],alpha=0.6)
         plt.show()
 
+def all_feats_Histogram(data: np.ndarray, n_labels: int, labels: np.ndarray, bins: int = 20):
+    colors = ["red", "green", "yellow", "blue", "gray", "orange"]
+    
+    for i in range(0, data.shape[0]):
+        for j in range(0,n_labels):
+            print("")
+
 def myScatter(data: np.ndarray, n_labels:int,labels:np.ndarray):
     colors = ["red", "green", "yellow", "blue", "gray", "orange"]
     n_feats = data.shape[0]

@@ -27,6 +27,7 @@ class BD_Wrapper:
         self.n_classes = n_classes
         self.C = C
         self.prior = np.array([1-e_prior, e_prior])
+
     
     def train(self, D:np.ndarray, L: np.ndarray) -> None:
         self.model.train(D, L)
