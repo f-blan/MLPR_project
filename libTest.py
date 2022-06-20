@@ -91,7 +91,7 @@ class LibTest():
     def test_KCV_FC(self):
         model = MVG_Model(3, False, False)
         kcv = KCV(model, -1, LOO = True)
-        acc=kcv.crossValidate(self.D, self.L)
+        acc, _=kcv.crossValidate(self.D, self.L)
         print(1-acc)
 
     def test_KCV_N(self):
@@ -113,13 +113,28 @@ class LibTest():
         print(1-acc)
     
     def test_LogReg(self):
-        l = 10e-2
+        l = 10e-6
         model = LRBinary_Model(2, l)
-
         model.train(self.DTRbin, self.LTRbin)
-
         acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
+        
+        l = 10e-3
+        model = LRBinary_Model(2, l)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
 
+        l = 0.1
+        model = LRBinary_Model(2, l)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
+
+        l = 1
+        model = LRBinary_Model(2, l)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
         print(1-acc)
     
     def test_SVMNL_RBF(self):
@@ -448,6 +463,17 @@ class LibTest():
         g,l = p.learn(self.DTR, self.LTR)
 
         myHistogram(g, 3, l)
+    
+    def test_best_pars_LR(self):
+        l = 10e-2
+        model = LRBinary_Model(2, l)
+        kcv = KCV(model, 5)
+        
+        minDCFs, vals = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 0,(-6, 0) )
+        minDCFs = [minDCFs]
+        #print(vals)
+        #print(minDCFs)
+        plot_vals(minDCFs, vals)
 
 
 
@@ -490,7 +516,8 @@ if __name__ == "__main__":
     #testClass.test_BD_risks()
     #testClass.test_ROC()
     #testClass.test_BE_plot()
-    testClass.test_Gauss_Preproc()
+    #testClass.test_Gauss_Preproc()
+    testClass.test_best_pars_LR()
 
 
 

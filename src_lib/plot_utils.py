@@ -2,6 +2,7 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import itertools as itt
+from typing import List
 
 def myHistogram(data: np.ndarray,n_labels:int,labels:np.ndarray, bins: int=20):
     colors = ["red", "green", "yellow", "blue", "gray", "orange"]
@@ -11,12 +12,14 @@ def myHistogram(data: np.ndarray,n_labels:int,labels:np.ndarray, bins: int=20):
             plt.hist(data[i, labels == j],bins=bins, density=True, color=colors[j],alpha=0.6)
         plt.show()
 
-def all_feats_Histogram(data: np.ndarray, n_labels: int, labels: np.ndarray, bins: int = 20):
+def plot_vals(dataY: List[List[float]], dataX: List[float], logplot: bool = True):
     colors = ["red", "green", "yellow", "blue", "gray", "orange"]
+
+    for i, app in enumerate(dataY):
+        plt.semilogx( dataX, app, color= colors[i])
     
-    for i in range(0, data.shape[0]):
-        for j in range(0,n_labels):
-            print("")
+    plt.show()
+        
 
 def myScatter(data: np.ndarray, n_labels:int,labels:np.ndarray):
     colors = ["red", "green", "yellow", "blue", "gray", "orange"]

@@ -7,7 +7,7 @@ from typing import Tuple, List
 import matplotlib.pyplot as plt
 
 class BD_Wrapper:
-    def __init__(self, modelType: str, n_classes: int, C: np.ndarray, e_prior: float, model: Model = None):
+    def __init__(self, modelType: str, n_classes: int, C: np.ndarray = np.array([[0,1],[1,0]]), e_prior: float=0.5, model: Model = None):
         
         if model is None:
             if(modelType=="mvg"):
@@ -46,6 +46,7 @@ class BD_Wrapper:
         preds[i2] = 0
         acc = np.sum(preds == L)/L.shape[0]
         return acc, preds, S
+
 
     
     def computeConfusionMatrix(self, D:np.ndarray, L:np.ndarray) -> np.ndarray:
@@ -88,6 +89,27 @@ class BD_Wrapper:
         labels = L
         
         llrs = np.log(Post[1, :]/Post[0, :])
+        thresholds = np.copy(llrs)
+        thresholds.sort()
+
+        thresholds = np.concatenate([np.array([-np.inf]), thresholds, np.array([np.inf])])
+        risks=[]
+        best_i = 0
+
+        for idx, t in enumerate(thresholds):
+            m = self.get_matrix_from_threshold(labels,llrs,t)
+            r = self.get_norm_risk(m)
+            risks.append(r)
+            if r<=risks[best_i]:
+                best_i = idx
+
+        return min(risks), thresholds[best_i]
+    
+    def compute_best_threshold_from_Scores(self, S: np.ndarray, L: np.ndarray) -> Tuple[float, float]:
+        Post = S
+        labels = L
+        
+        llrs = S#np.log(Post[1, :]/Post[0, :])
         thresholds = np.copy(llrs)
         thresholds.sort()
 
@@ -148,10 +170,11 @@ class BD_Wrapper:
             minDCFs.append(self.compute_best_threshold(D,L)[0])
 
         self.prior = old_prior        
-
-        DCFs.reverse()
+        print(minDCFs)
+        print(priorLogOdds)
+        #DCFs.reverse()
         
-        minDCFs.reverse()
+        #minDCFs.reverse()
         plt.plot(priorLogOdds, DCFs, label='DCF', color= 'r')
 
         plt.plot(priorLogOdds, minDCFs, label='minDCF', color= 'b')

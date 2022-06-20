@@ -1,6 +1,12 @@
+from statistics import mode
+from src_lib.BD_wrapper import BD_Wrapper
+from src_lib.LR_Model import LRBinary_Model
+from src_lib.MVG_Model import MVG_Model
+from src_lib.SVM_Model import SVMNL_Model, SVML_Model
+
 from src_lib.Model import Model
 import numpy as np
-from typing import List, Tuple
+from typing import Any, List, Tuple
 import math
 
 class KCV:
@@ -57,18 +63,81 @@ class KCV:
         tot_c = 0
         tot_s = 0
 
+        whole_S = np.zeros((self.model.n_classes, D.shape[1]))
+        whole_S_i = 0
+
         for held_out in range(0, K):
             (DTR, LTR), (DTE,LTE) = self._create_partition(parts, held_out)
 
             self.model.train(DTR, LTR)
 
-            _, preds, __ = self.model.predict(DTE, LTE)
+            _, preds, S = self.model.predict(DTE, LTE)
 
+            whole_S[:, whole_S_i : whole_S_i + S.shape[1]] = S
+            whole_S_i+=S.shape[1]
             tot_c += (preds==LTE).sum()
             tot_s += LTE.shape[0]
         
-        return tot_c/tot_s
+        return tot_c/tot_s, whole_S
     
 
-    def find_best_par(self ):
-        pass
+    def find_best_par(self, model: Model, D: np.ndarray, L:np.ndarray, par_index: int, bounds: Tuple[float, float], logBounds: bool = True, logbase: float=10.0, e_prior: float = 0.5) -> Any:
+        
+        if(logBounds):
+            par_vals = np.logspace(bounds[0], bounds[1], num=20, base=logbase)
+        else:
+            par_vals = np.linspace(bounds[0], bounds[1], num=20)
+        
+        def get_next_LR(val_index):
+            model.reg_lambda = par_vals[val_index]
+        
+        def get_next_SVM_C(val_index):
+            model.C = par_vals[val_index]
+
+
+        def get_next_SVM_K(val_index):
+            model.K = par_vals[val_index]
+
+        def get_next_GMM_exp(val_index):
+            model.n_gauss_exp = par_vals[val_index]
+            
+
+        def get_next_GMM_alpha(val_index):
+            model.alpha = par_vals[val_index]
+        
+        def get_next_GMM_bound(val_index):
+            model.bound = par_vals[val_index]
+                 
+
+        if type(model).__name__ == "MVG_Model":
+            print("No hyperparams for mvg model, aborting")
+            return
+        elif type(model).__name__ == "LRBinary_Model":
+            print("assigned")
+            get_next_par = get_next_LR
+        elif type(model).__name__ == "SVMNL_Model" or type(model).__name__ == "SVML_Model":
+            get_next_par =  get_next_SVM_C if par_index == 0  else  get_next_SVM_K
+        elif type(model).__name__ == "LRBinary_Model":
+            get_next_par =  get_next_GMM_exp if par_index == 0 else get_next_GMM_alpha
+            if par_index == 2:
+                get_next_par = get_next_GMM_bound
+        
+        minDCFs: List[float] = []
+
+        self.model = model
+        
+        w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
+        for i in range(0, par_vals.shape[0]):
+            get_next_par(i)
+            #print(self.model.reg_lambda)
+            _, whole_S = self.crossValidate(D, L)
+            #print(whole_S[:,0])
+            #print(_)
+
+            minDCF, _ =w.compute_best_threshold_from_Scores(whole_S[0,:], L)
+            minDCFs.append(minDCF)
+            
+        
+        return minDCFs, par_vals
+        
+        

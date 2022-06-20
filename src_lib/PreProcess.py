@@ -115,7 +115,7 @@ class Gaussianize(PreProcess):
         
     def apply(self, D: np.ndarray, L: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         if self.next is None:
-            return self._LDA_compute(D), L
+            return self._Gauss_compute(D), L
         else:
-            return self.next.apply(self._LDA_compute, L)
+            return self.next.apply(self._Gauss_compute, L)
         
