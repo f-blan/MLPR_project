@@ -14,6 +14,7 @@ class GMMLBG_Model(Model):
         self.verbose = verbose
         self.constrained = constrained
         self.bound = bound
+        self.verbose = verbose
 
     def _compute_responsibility(self, X:np.ndarray, gmm: List[Tuple[float, np.ndarray, np.ndarray]]) -> np.ndarray:
         Sj = np.zeros((len(gmm), X.shape[1]))
@@ -64,12 +65,18 @@ class GMMLBG_Model(Model):
     
     def _train(self, X:np.ndarray, L:np.ndarray) -> List[Tuple[float, np.ndarray, np.ndarray]]:
         
-        gmm = [(1.0,vcol(X.mean(1)), get_covariance(X))]
+        C = get_covariance(X)
+        
+        if self.constrained:
+            U, s, _ = np.linalg.svd(C)
+            s[s<self.bound] = self.bound
+            C = np.dot(U, vcol(s)*U.T)
 
+        gmm = [(1.0,vcol(X.mean(1)), C)]
+        
         for i in range(0, self.n_gauss_exp):
             #gmm_opt = self._EMtrain(X, L, gmm)
             gmm_2g = []
-
             for w, mu, C in gmm:
                 U,s,Vh = np.linalg.svd(C)
                 d = U[:, 0:1]*s[0]**0.5 * self.alpha
@@ -101,6 +108,7 @@ class GMMLBG_Model(Model):
         #print(ret)
         return sp.special.logsumexp(ret, axis=0)
     
+    
     def _get_score_matrix(self, DTE: np.ndarray, pars, log_scores = False) -> np.ndarray:
         n_classes = len(pars)
         vecs=[]
@@ -118,14 +126,15 @@ class GMMLBG_Model(Model):
     def predict(self, D: np.ndarray, L: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         D, L = self.preProcess.apply(D,L)
         logS= self._get_score_matrix(D, self.pars, log_scores=True)
+        print(logS.shape)
         logSjoint= logS+ np.log(self.prior)
         logSMarginal= vrow(sp.special.logsumexp(logSjoint))
         logSPost = logSjoint - logSMarginal
         logPredL = np.argmax(logSPost, axis=0)
         acc, corrects = compute_acc(logPredL, L)
 
-
-        return acc, logPredL, logS
+        print(logSPost.shape)
+        return acc, logPredL, logS[1, :]/logS[0, :]
 
 
 class GMMLBG_Diag_Model(GMMLBG_Model):

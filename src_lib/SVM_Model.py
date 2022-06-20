@@ -147,5 +147,5 @@ class SVML_Model(Model):
         preds = S>0
         true = L >0
         acc=np.sum(preds==true)/L.shape[0]
-
-        return acc, preds, S
+        
+        return acc, preds, np.reshape(S, (S.shape[1]))

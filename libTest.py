@@ -97,19 +97,19 @@ class LibTest():
     def test_KCV_N(self):
         model = MVG_Model(3, False, True)
         kcv = KCV(model, -1, LOO = True)
-        acc=kcv.crossValidate(self.D, self.L)
+        acc,_=kcv.crossValidate(self.D, self.L)
         print(1-acc)
     
     def test_KCV_T(self):
         model = MVG_Model(3, True, False)
         kcv = KCV(model, -1, LOO = True)
-        acc=kcv.crossValidate(self.D, self.L)
+        acc,_=kcv.crossValidate(self.D, self.L)
         print(1-acc)
 
     def test_KCV_NT(self):
         model = MVG_Model(3, True, True)
         kcv = KCV(model, -1, LOO = True)
-        acc=kcv.crossValidate(self.D, self.L)
+        acc,_=kcv.crossValidate(self.D, self.L)
         print(1-acc)
     
     def test_LogReg(self):
@@ -313,12 +313,13 @@ class LibTest():
         model.train(self.DTR, self.LTR)
         acc, pred, S =model.predict(self.DTE,self.LTE)
         print(1-acc)
+        print(S)
 
     def test_BD_simple(self):
         model = MVG_Model(3, False, False )
         model.train(self.DTR, self.LTR)
         m=model.getConfusionMatrix(self.DTE, self.LTE)
-        print(m)
+        
 
         model = MVG_Model(3, False, True )
         model.train(self.DTR, self.LTR)
@@ -469,12 +470,98 @@ class LibTest():
         model = LRBinary_Model(2, l)
         kcv = KCV(model, 5)
         
-        minDCFs, vals = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 0,(-6, 0) )
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 0,(-8, 0) )
         minDCFs = [minDCFs]
-        #print(vals)
-        #print(minDCFs)
+        accs = [accs]
+        
         plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
 
+    
+    def test_best_pars_SVML(self):
+        model = SVML_Model(2, 1, 1)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 1,(-4, 4) )
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+
+        model = SVML_Model(2, 1, 0.1)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 0,(0, 1) )
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+    
+    def test_best_pars_SVMNL_Poly(self):
+        kernel = Kernel("poly2",d=2, c=1)
+        model = SVMNL_Model(2, 1, 1, kernel)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 1,(-4, 4) )
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+
+        model = SVMNL_Model(2, 1, 0.1, kernel)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 0,(0, 1) )
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+
+    def test_best_pars_SVMNL_RBF(self):
+        kernel = Kernel("RBF",gamma=1.0)
+        model = SVMNL_Model(2, 1, 1, kernel)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 1,(-4, 4) )
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+
+        model = SVMNL_Model(2, 1, 0.1, kernel)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 0,(0, 1) )
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+    
+    def test_best_pars_bound(self):
+        model = GMMLBG_Model(2,1e-6,3, 3, bound=0.01)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 2,(-6, 2))
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+
+
+    def test_best_pars_GMM(self):
+        model = GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 0,(1, 6), logbase=2, n_vals = 6, logBounds=False)
+        minDCFs = [minDCFs]
+        accs = [accs]
+        
+        print(vals)
+        print(minDCFs)
+        print(accs)
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
+
+        
 
 
 
@@ -517,7 +604,11 @@ if __name__ == "__main__":
     #testClass.test_ROC()
     #testClass.test_BE_plot()
     #testClass.test_Gauss_Preproc()
-    testClass.test_best_pars_LR()
+    #testClass.test_best_pars_LR()
+    #testClass.test_best_pars_SVML()
+    #testClass.test_best_pars_SVMNL_Poly()
+    #testClass.test_best_pars_SVMNL_RBF()
+    testClass.test_best_pars_GMM()
 
 
 

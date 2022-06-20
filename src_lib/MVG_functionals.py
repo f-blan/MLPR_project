@@ -35,7 +35,7 @@ def MVG_Log_Predict(
     acc, corrects = compute_acc(logPredL, L)
 
 
-    return acc, logPredL, np.exp(logSPost)
+    return acc, logPredL, logSPost[1, :]/logSPost[0, :]
 
 def get_MLE_Gaussian_parameters( D: np.ndarray, L:np.ndarray) -> List[Tuple[np.ndarray, np.ndarray]]:
     pars : List[Tuple[np.ndarray, np.ndarray]] =[]

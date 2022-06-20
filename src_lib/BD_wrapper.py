@@ -33,10 +33,10 @@ class BD_Wrapper:
         self.model.train(D, L)
     
     def predict(self, D: np.ndarray, L:np.ndarray, th: float=None) -> Tuple[float, np.ndarray, np.ndarray]:
-        _, __, S =   self.model.predict(D,L)
+        _, __, llrs =   self.model.predict(D,L)
         
         
-        llrs = np.log(S[1, :]/S[0, :])
+        #llrs = np.log(S[1, :]/S[0, :])
         if th == None:
             th = -np.log((self.prior[1]*self.C[0, 1])/(self.prior[0]*self.C[1,0]))
         preds = llrs
@@ -85,10 +85,10 @@ class BD_Wrapper:
 
 
     def compute_best_threshold(self, D:np.ndarray, L:np.ndarray) -> Tuple[float, float]:
-        _, __, Post =   self.model.predict(D,L)
+        _, __, llrs =   self.model.predict(D,L)
         labels = L
         
-        llrs = np.log(Post[1, :]/Post[0, :])
+        #llrs = np.log(Post[1, :]/Post[0, :])
         thresholds = np.copy(llrs)
         thresholds.sort()
 
@@ -127,10 +127,10 @@ class BD_Wrapper:
         return min(risks), thresholds[best_i]
 
     def plot_ROC_over_thresholds(self, D: np.ndarray, L:np.ndarray) -> None:
-        _, __, Post =   self.model.predict(D,L)
+        _, __, llrs =   self.model.predict(D,L)
         labels = L
         
-        llrs = np.log(Post[1, :]/Post[0, :])
+        #llrs = np.log(Post[1, :]/Post[0, :])
         thresholds = np.copy(llrs)
         thresholds.sort()
 
@@ -150,10 +150,10 @@ class BD_Wrapper:
         plt.show()
 
     def plot_Bayes_errors(self, D, L) -> None:
-        _, __, Post =   self.model.predict(D,L)
+        _, __, llrs =   self.model.predict(D,L)
         labels = L
         
-        llrs = np.log(Post[1, :]/Post[0, :])
+        #llrs = np.log(Post[1, :]/Post[0, :])
         old_prior = self.prior
         priorLogOdds = np.linspace(-3, 3, 21)
         DCFs = []
@@ -170,8 +170,7 @@ class BD_Wrapper:
             minDCFs.append(self.compute_best_threshold(D,L)[0])
 
         self.prior = old_prior        
-        print(minDCFs)
-        print(priorLogOdds)
+        
         #DCFs.reverse()
         
         #minDCFs.reverse()

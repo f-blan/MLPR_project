@@ -4,6 +4,7 @@ from src_lib.LR_Model import LRBinary_Model
 from src_lib.MVG_Model import MVG_Model
 from src_lib.SVM_Model import SVMNL_Model, SVML_Model
 
+from src_lib.utils import *
 from src_lib.Model import Model
 import numpy as np
 from typing import Any, List, Tuple
@@ -52,7 +53,7 @@ class KCV:
         return (DTR, LTR), (parts[held_out][0], parts[held_out][1])
         
 
-    def crossValidate(self, D: np.ndarray, L: np.ndarray) -> float:
+    def crossValidate(self, D: np.ndarray, L: np.ndarray, verbose:bool = False) -> float:
         K = self.K
 
         if self.LOO:
@@ -63,7 +64,7 @@ class KCV:
         tot_c = 0
         tot_s = 0
 
-        whole_S = np.zeros((self.model.n_classes, D.shape[1]))
+        whole_S = np.zeros((D.shape[1]))
         whole_S_i = 0
 
         for held_out in range(0, K):
@@ -73,20 +74,20 @@ class KCV:
 
             _, preds, S = self.model.predict(DTE, LTE)
 
-            whole_S[:, whole_S_i : whole_S_i + S.shape[1]] = S
-            whole_S_i+=S.shape[1]
+            whole_S[whole_S_i : whole_S_i + S.shape[0]] = S
+            whole_S_i+=S.shape[0]
             tot_c += (preds==LTE).sum()
             tot_s += LTE.shape[0]
         
         return tot_c/tot_s, whole_S
     
 
-    def find_best_par(self, model: Model, D: np.ndarray, L:np.ndarray, par_index: int, bounds: Tuple[float, float], logBounds: bool = True, logbase: float=10.0, e_prior: float = 0.5) -> Any:
+    def find_best_par(self, model: Model, D: np.ndarray, L:np.ndarray, par_index: int, bounds: Tuple[float, float], logBounds: bool = True, logbase: float=10.0, e_prior: float = 0.5, verbose:bool = False, n_vals: int=20) -> Any:
         
         if(logBounds):
-            par_vals = np.logspace(bounds[0], bounds[1], num=20, base=logbase)
+            par_vals = np.logspace(bounds[0], bounds[1], num=n_vals, base=logbase)
         else:
-            par_vals = np.linspace(bounds[0], bounds[1], num=20)
+            par_vals = np.linspace(bounds[0], bounds[1], num=n_vals)
         
         def get_next_LR(val_index):
             model.reg_lambda = par_vals[val_index]
@@ -99,7 +100,7 @@ class KCV:
             model.K = par_vals[val_index]
 
         def get_next_GMM_exp(val_index):
-            model.n_gauss_exp = par_vals[val_index]
+            model.n_gauss_exp = math.floor(par_vals[val_index])
             
 
         def get_next_GMM_alpha(val_index):
@@ -113,31 +114,30 @@ class KCV:
             print("No hyperparams for mvg model, aborting")
             return
         elif type(model).__name__ == "LRBinary_Model":
-            print("assigned")
             get_next_par = get_next_LR
         elif type(model).__name__ == "SVMNL_Model" or type(model).__name__ == "SVML_Model":
-            get_next_par =  get_next_SVM_C if par_index == 0  else  get_next_SVM_K
-        elif type(model).__name__ == "LRBinary_Model":
+            get_next_par =  get_next_SVM_C if par_index == 1  else  get_next_SVM_K
+        elif type(model).__name__ == "GMMLBG_Model" or type(model).__name__ == "GMMLBG_Diag_Model" or type(model).__name__ == "GMMLBG_Tied_Model":
             get_next_par =  get_next_GMM_exp if par_index == 0 else get_next_GMM_alpha
             if par_index == 2:
                 get_next_par = get_next_GMM_bound
         
         minDCFs: List[float] = []
-
+        accs: List[float] = []
         self.model = model
         
         w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
         for i in range(0, par_vals.shape[0]):
+            if verbose: print(f"iteration: {i}")
             get_next_par(i)
-            #print(self.model.reg_lambda)
-            _, whole_S = self.crossValidate(D, L)
-            #print(whole_S[:,0])
-            #print(_)
+            acc, whole_S = self.crossValidate(D, L, verbose)
 
-            minDCF, _ =w.compute_best_threshold_from_Scores(whole_S[0,:], L)
+            
+            accs.append(acc)
+            minDCF, _ =w.compute_best_threshold_from_Scores(whole_S, L)
             minDCFs.append(minDCF)
             
         
-        return minDCFs, par_vals
+        return minDCFs, par_vals, accs
         
         

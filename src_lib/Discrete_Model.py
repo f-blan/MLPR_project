@@ -171,7 +171,7 @@ class Discrete_Model(Model):
             self.prior
         )
         acc, preds = compute_accuracy(predictions, L)
-        return acc, preds, predictions
+        return acc, preds, np.log(predictions[1, :]/predictions[0, :])
 
     def getConfusionMatrix(self, D, L):
         _, predL, __ = self.predict(D, L)

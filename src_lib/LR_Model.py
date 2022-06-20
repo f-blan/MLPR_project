@@ -9,7 +9,7 @@ from typing import Tuple
 from scipy.optimize import fmin_l_bfgs_b
 
 class LRBinary_Model(Model):
-    def __init__(self, n_classes: int,  reg_lambda:float, preProcess: PreProcess = PreProcess("None")):
+    def __init__(self, n_classes: int,  reg_lambda:float, preProcess: PreProcess = PreProcess("None"), rebalance = False):
         super().__init__(n_classes, preProcess=preProcess)
         self.reg_lambda = reg_lambda
     
@@ -46,4 +46,4 @@ class LRBinary_Model(Model):
         true = L >0
         acc=np.sum(preds==true)/preds.shape[1]
 
-        return acc, preds, S
+        return acc, preds, np.reshape(S, (S.shape[1]))
