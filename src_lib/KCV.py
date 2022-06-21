@@ -10,7 +10,7 @@ import numpy as np
 from typing import Any, List, Tuple
 import math
 
-VERBOSE=True
+VERBOSE=False
 
 class KCV:
     def __init__(self, model: Model, K: int, LOO: bool = False):
