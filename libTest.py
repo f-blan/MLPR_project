@@ -568,7 +568,30 @@ class LibTest():
         plot_vals(accs, vals)
 
 
+    def test_load_ds(self):
+        D, L = load_ds("PulsarTrain.txt")
+        print(D.shape)
+        print(L.shape)
 
+        D, L = load_ds("PulsarTest.txt")
+        print(D.shape)
+        print(L.shape)
+
+        D, L = load_ds("WineTrain.txt")
+        print(D.shape)
+        print(L.shape)
+
+        D, L = load_ds("WineTest.txt")
+        print(D.shape)
+        print(L.shape)
+
+        D, L = load_ds("GenderTrain.txt", separator=", ")
+        print(D.shape)
+        print(L.shape)
+
+        D, L = load_ds("GenderTest.txt")
+        print(D.shape)
+        print(L.shape)
 
 
         
@@ -598,9 +621,9 @@ if __name__ == "__main__":
     #testClass.test_SVMNL_Poly()
     #testClass.test_SVM_linear()
     #testClass.test_GMM_LBG_ll()
-    testClass.test_GMM_LBG_Classify_FC()
-    testClass.test_GMM_LBG_Classify_D()
-    testClass.test_GMM_LBG_Classify_T()
+    #testClass.test_GMM_LBG_Classify_FC()
+    #testClass.test_GMM_LBG_Classify_D()
+    #testClass.test_GMM_LBG_Classify_T()
     #testClass.test_BD_simple()
     #testClass.test_CM_comm()
     #testClass.test_BD_Opt()
@@ -613,6 +636,8 @@ if __name__ == "__main__":
     #testClass.test_best_pars_SVMNL_Poly()
     #testClass.test_best_pars_SVMNL_RBF()
     #testClass.test_best_pars_GMM()
+    testClass.test_load_ds()
+
 
 
 

@@ -80,3 +80,19 @@ def load_iris_binary():
     L = L[L!=0] # We remove setosa from L
     L[L==2] = 0 # We assign label 0 to virginica (was label 2)
     return D, L
+
+def load_ds(filename: str, separator: str = ","):
+    f=open(f"data/{filename}")
+
+    vecs = []
+    labels = []
+    for line in f:
+        words = line.split(separator)
+        l= words[-1].strip()
+
+        feats= [float(i) for i in words[0:-1]]
+        vecs.append(np.array(feats))
+        labels.append(int(l))
+
+    f.close()
+    return np.transpose(np.array(vecs)), np.array(labels)
