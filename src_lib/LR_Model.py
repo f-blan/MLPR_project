@@ -12,6 +12,7 @@ class LRBinary_Model(Model):
     def __init__(self, n_classes: int,  reg_lambda:float, preProcess: PreProcess = PreProcess("None"), rebalance = False):
         super().__init__(n_classes, preProcess=preProcess)
         self.reg_lambda = reg_lambda
+        self.rebalance = rebalance
     
     def _logRegFun(self, v: np.ndarray) -> float:
         w, b = v[0:-1], v[-1]
@@ -20,9 +21,19 @@ class LRBinary_Model(Model):
         
         const = (self.reg_lambda/2)*np.power(np.linalg.norm(w),2)
 
-        S = np.dot(wt, self.DTR)+b
-        cxe=np.logaddexp(0, -S*self.z).mean()
-        return const + cxe 
+        if self.rebalance == False:
+            S = np.dot(wt, self.DTR)+b
+            cxe=np.logaddexp(0, -S*self.z).mean()
+            return const + cxe
+        else:
+            St = np.dot(wt, self.Dt) + b
+            Sf = np.dot(wt, self.Df) + b
+
+            cxT = self.prior[1]*np.logaddexp(0, -St).mean()
+            cxF = self.prior[0]*np.logaddexp(0, Sf).mean()
+
+            return const + cxT + cxF
+
 
 
     def train(self, D: np.ndarray, L: np.ndarray) :
@@ -30,9 +41,17 @@ class LRBinary_Model(Model):
         self.DTR = D
         self.LTR = L
 
+        
         self.z = L.copy()
         self.z[L==0]=-1
         
+        if self.rebalance:
+            self.nT = (L == 1).sum()
+            self.nF = (L == 0).sum()
+            self.Dt = D[:,L == 1]
+            self.Df = D[:,L == 0]
+            print(f"nT = {self.nT}, nF = {self.nF}, prior= {self.prior}")
+
         x0 = np.zeros((D.shape[0]+1))
         x,f,d=fmin_l_bfgs_b(self._logRegFun, x0, approx_grad = True, iprint=0)
 

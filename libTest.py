@@ -137,6 +137,31 @@ class LibTest():
         acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
         print(1-acc)
     
+    def test_LogReg_Rebalanced(self):
+        l = 10e-6
+        model = LRBinary_Model(2, l, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
+        
+        l = 10e-3
+        model = LRBinary_Model(2, l,rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
+
+        l = 0.1
+        model = LRBinary_Model(2, l,rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
+
+        l = 1
+        model = LRBinary_Model(2, l,rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
+    
     def test_SVMNL_RBF(self):
         kernel = Kernel("RBF",gamma=1.0)
         model = SVMNL_Model(2,0.0,1,kernel)
@@ -616,7 +641,9 @@ if __name__ == "__main__":
     #testClass.test_KCV_N()
     #testClass.test_KCV_T()
     #testClass.test_KCV_NT()
-    #testClass.test_LogReg()
+    testClass.test_LogReg()
+    print("-------------------")
+    testClass.test_LogReg_Rebalanced()
     #testClass.test_SVMNL_RBF()
     #testClass.test_SVMNL_Poly()
     #testClass.test_SVM_linear()
@@ -636,7 +663,7 @@ if __name__ == "__main__":
     #testClass.test_best_pars_SVMNL_Poly()
     #testClass.test_best_pars_SVMNL_RBF()
     #testClass.test_best_pars_GMM()
-    testClass.test_load_ds()
+    #testClass.test_load_ds()
 
 
 
