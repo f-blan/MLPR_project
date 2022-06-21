@@ -99,14 +99,17 @@ class GMMLBG_Model(Model):
         if self.verbose: print(f"training is over {len(self.pars)}")
         
     def _logpdf_GMM(self, X:np.ndarray, gmm: list) -> float:
-        ret = np.zeros((len(gmm), X.shape[1]))
+        Sj = np.zeros((len(gmm), X.shape[1]))
         i=0
         for  w, mu, C in gmm:
-            ret[i, :]= logpdf_GAU_ND_Opt(X, mu, C) + np.log(w)
+            Sj[i, :]= logpdf_GAU_ND_Opt(X, mu, C) + np.log(w)
             i+=1
-
-        #print(ret)
-        return sp.special.logsumexp(ret, axis=0)
+        #print(ret.shape)
+        Sm = sp.special.logsumexp(Sj, axis=0)
+        ll = Sj.sum(axis = 0)/X.shape[1]
+        #print(ll.shape)
+        ret = np.exp(Sj- Sm)
+        return Sm, ll  
     
     
     def _get_score_matrix(self, DTE: np.ndarray, pars, log_scores = False) -> np.ndarray:
@@ -116,8 +119,8 @@ class GMMLBG_Model(Model):
         for i in range(0,self.n_classes):
         
             
-            vec  =self._logpdf_GMM(DTE, pars[i])
-
+            vec, _  =self._logpdf_GMM(DTE, pars[i])
+            #print(f"vec shape: {vec.shape}")
             vecs.append(vec) if log_scores else vecs.append(np.exp(vec))
 
     
@@ -125,15 +128,15 @@ class GMMLBG_Model(Model):
     
     def predict(self, D: np.ndarray, L: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         D, L = self.preProcess.apply(D,L)
-        logS= self._get_score_matrix(D, self.pars, log_scores=True)
-        print(logS.shape)
+        logS= self._get_score_matrix(D, self.pars, log_scores=False)
+        #print(logS.shape)
         logSjoint= logS+ np.log(self.prior)
         logSMarginal= vrow(sp.special.logsumexp(logSjoint))
         logSPost = logSjoint - logSMarginal
         logPredL = np.argmax(logSPost, axis=0)
         acc, corrects = compute_acc(logPredL, L)
 
-        print(logSPost.shape)
+        #print(logSPost.shape)
         return acc, logPredL, logS[1, :]/logS[0, :]
 
 

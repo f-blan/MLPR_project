@@ -6,6 +6,8 @@ from src_lib.Discrete_Model import *
 from typing import Tuple, List
 import matplotlib.pyplot as plt
 
+
+VERBOSE = False
 class BD_Wrapper:
     def __init__(self, modelType: str, n_classes: int, C: np.ndarray = np.array([[0,1],[1,0]]), e_prior: float=0.5, model: Model = None):
         
@@ -71,6 +73,8 @@ class BD_Wrapper:
     def get_norm_risk(self, M: np.ndarray) -> float:
         risk = self.get_risk(M)
         opt_risk = np.min(np.array([self.prior[1]*self.C[0,1], self.prior[0]*self.C[1,0]]))
+
+        if VERBOSE: print(f"minDCF: {risk/opt_risk}, acc: {(M[0,0]+M[1,1])/(M.sum())}")
         return risk/opt_risk
 
     def get_matrix_from_threshold(self, L:np.ndarray, llrs:np.ndarray, th: float) -> np.ndarray:

@@ -555,13 +555,17 @@ class LibTest():
         minDCFs = [minDCFs]
         accs = [accs]
         
-        print(vals)
-        print(minDCFs)
-        print(accs)
         plot_vals(minDCFs, vals)
         plot_vals(accs, vals)
 
+        model = GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTRbin, self.LTRbin, 1,(-4, 0))
+        minDCFs = [minDCFs]
+        accs = [accs]
         
+        plot_vals(minDCFs, vals)
+        plot_vals(accs, vals)
 
 
 

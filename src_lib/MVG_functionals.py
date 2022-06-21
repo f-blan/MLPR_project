@@ -27,7 +27,7 @@ def MVG_Log_Predict(
     pars: List[Tuple[np.ndarray, np.ndarray]]) -> Tuple[float, np.ndarray, np.ndarray]:
 
 
-    logS= get_score_matrix(D, pars, log_scores=True)
+    logS= get_score_matrix(D, pars, log_scores=False)
     logSjoint= logS+ np.log(prior)
     logSMarginal= vrow(sp.special.logsumexp(logSjoint))
     logSPost = logSjoint - logSMarginal

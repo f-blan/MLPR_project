@@ -10,6 +10,8 @@ import numpy as np
 from typing import Any, List, Tuple
 import math
 
+VERBOSE=True
+
 class KCV:
     def __init__(self, model: Model, K: int, LOO: bool = False):
         self.model = model
@@ -135,6 +137,8 @@ class KCV:
             
             accs.append(acc)
             minDCF, _ =w.compute_best_threshold_from_Scores(whole_S, L)
+
+            print(f"minDCF: {minDCF}, acc: {acc}")
             minDCFs.append(minDCF)
             
         
