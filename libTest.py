@@ -212,6 +212,32 @@ class LibTest():
         acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
         print(1-acc)
     
+    def test_SVMNL_Poly_Reb(self):
+        kernel = Kernel("poly2",d=2, c=0)
+        model = SVMNL_Model(2,0.0,1,kernel, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        kernel = Kernel("poly2",d=2, c=1)
+        model = SVMNL_Model(2,0.0,1,kernel, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        kernel = Kernel("poly2",d=2, c=0)
+        model = SVMNL_Model(2,1.0,1,kernel, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        kernel = Kernel("poly2",d=2, c=1)
+        model = SVMNL_Model(2,1.0,1,kernel, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+
     def test_SVM_linear(self):
         model = SVML_Model(2, 1, 0.1)
         model.train(self.DTRbin, self.LTRbin)
@@ -239,6 +265,37 @@ class LibTest():
         print(1-acc)
 
         model = SVML_Model(2, 10, 10)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+    
+    def test_SVM_linear_Reb(self):
+        model = SVML_Model(2, 1, 0.1, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        model = SVML_Model(2, 1, 1, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        model = SVML_Model(2, 1, 10, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        model = SVML_Model(2, 10, 0.1, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        model = SVML_Model(2, 10, 1, rebalance=True)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
+        print(1-acc)
+
+        model = SVML_Model(2, 10, 10, rebalance=True)
         model.train(self.DTRbin, self.LTRbin)
         acc, preds, S = model.predict(self.DTEbin,self.LTEbin)
         print(1-acc)
@@ -641,12 +698,14 @@ if __name__ == "__main__":
     #testClass.test_KCV_N()
     #testClass.test_KCV_T()
     #testClass.test_KCV_NT()
-    testClass.test_LogReg()
-    print("-------------------")
-    testClass.test_LogReg_Rebalanced()
+    #testClass.test_LogReg()
+    #testClass.test_LogReg_Rebalanced()
     #testClass.test_SVMNL_RBF()
-    #testClass.test_SVMNL_Poly()
+    testClass.test_SVMNL_Poly()
+    print("----------")
+    testClass.test_SVMNL_Poly_Reb()
     #testClass.test_SVM_linear()
+    #testClass.test_SVM_linear_Reb()
     #testClass.test_GMM_LBG_ll()
     #testClass.test_GMM_LBG_Classify_FC()
     #testClass.test_GMM_LBG_Classify_D()

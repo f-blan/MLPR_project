@@ -41,12 +41,13 @@ class Kernel:
             return self._dotRBF(x1,x2, self.gamma)
 
 class SVMNL_Model(Model):
-    def __init__(self, n_classes: int, K: float, C: float, kernel: Kernel = Kernel(), preProcess: PreProcess = PreProcess("None")):
+    def __init__(self, n_classes: int, K: float, C: float, kernel: Kernel = Kernel(), preProcess: PreProcess = PreProcess("None"), rebalance: bool = False):
         super().__init__(n_classes, preProcess=preProcess)
 
         self.C = C
         self.kernel = kernel
         self.K = K
+        self.rebalance= rebalance
         
 
     def _compute_L(self, alpha: np.ndarray) -> Tuple[float, np.ndarray]:
@@ -70,7 +71,12 @@ class SVMNL_Model(Model):
         self.H = Z*G
 
         x0 = np.zeros((D.shape[1]))
-        boundsList = [(0,self.C)] *D.shape[1]
+        if self.rebalance== False:
+            boundsList = [(0,self.C)] *D.shape[1]
+        else:
+            Ct = (self.C*self.prior[1])/(L==1).mean()
+            Cf = (self.C*self.prior[1])/(L==0).mean()
+            boundsList = [(0, Ct if label == 1 else Cf) for label in L]
         
         x,f,d=fmin_l_bfgs_b(self._compute_L, x0, iprint=0, bounds= boundsList, factr= 1.0, maxiter = 100000, maxfun = 100000)
         self.alphas = x
@@ -94,10 +100,11 @@ class SVMNL_Model(Model):
 
     
 class SVML_Model(Model):
-    def __init__(self, n_classes: int, K: float, C: float, preProcess: PreProcess = PreProcess("None")):
+    def __init__(self, n_classes: int, K: float, C: float, preProcess: PreProcess = PreProcess("None"), rebalance: bool = False):
         super().__init__(n_classes, preProcess=preProcess)
         self.K = K
         self.C = C
+        self.rebalance = rebalance
 
     def _build_vecs(self, D: np.ndarray, to_add: float) -> np.ndarray:
         m = np.ones((D.shape[0]+1, D.shape[1]))
@@ -126,9 +133,15 @@ class SVML_Model(Model):
         Z= np.dot(vcol(Lz),vrow(Lz))
 
         self.H = Z*G
-
+        
         x0 = np.zeros((Dc.shape[1]))
-        boundsList = [(0,self.C)] *Dc.shape[1]
+        if self.rebalance== False:
+            boundsList = [(0,self.C)] *Dc.shape[1]
+        else:
+            Ct = (self.C*self.prior[1])/(L==1).mean()
+            Cf = (self.C*self.prior[1])/(L==0).mean()
+            boundsList = [(0, Ct if label == 1 else Cf) for label in L]
+        #print(boundsList)
         
         x,f,d=fmin_l_bfgs_b(self._compute_L, x0, iprint=0, bounds= boundsList, factr= 1.0, maxiter = 100000, maxfun = 100000)
         self.alphas = x
