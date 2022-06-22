@@ -545,6 +545,7 @@ class LibTest():
 
         g,l = p.learn(self.DTR, self.LTR)
 
+        #print(g)
         myHistogram(g, 3, l)
     
     def test_best_pars_LR(self):
@@ -674,6 +675,12 @@ class LibTest():
         D, L = load_ds("GenderTest.txt")
         print(D.shape)
         print(L.shape)
+    
+    def test_load_shuffle(self):
+        (D, L), (T,TL) = load_Gender(shuffle = True)
+
+        print(L)
+        print(TL)
 
 
         
@@ -701,9 +708,8 @@ if __name__ == "__main__":
     #testClass.test_LogReg()
     #testClass.test_LogReg_Rebalanced()
     #testClass.test_SVMNL_RBF()
-    testClass.test_SVMNL_Poly()
-    print("----------")
-    testClass.test_SVMNL_Poly_Reb()
+    #testClass.test_SVMNL_Poly()
+    #testClass.test_SVMNL_Poly_Reb()
     #testClass.test_SVM_linear()
     #testClass.test_SVM_linear_Reb()
     #testClass.test_GMM_LBG_ll()
@@ -723,6 +729,7 @@ if __name__ == "__main__":
     #testClass.test_best_pars_SVMNL_RBF()
     #testClass.test_best_pars_GMM()
     #testClass.test_load_ds()
+    testClass.test_load_shuffle()
 
 
 

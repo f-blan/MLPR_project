@@ -5,7 +5,7 @@ import sklearn.datasets
 
 import json
 
-
+import random as r
 def load_data_comm():
 
     lInf = []
@@ -81,12 +81,20 @@ def load_iris_binary():
     L[L==2] = 0 # We assign label 0 to virginica (was label 2)
     return D, L
 
-def load_ds(filename: str, separator: str = ","):
+def load_ds(filename: str, separator: str = ",", shuffle = False, seed = 1):
     f=open(f"data/{filename}")
 
     vecs = []
     labels = []
+    lines = []
     for line in f:
+        lines.append(line)
+
+    if shuffle:
+        r.Random(seed).shuffle(lines)
+        
+
+    for line in lines:
         words = line.split(separator)
         l= words[-1].strip()
 
@@ -96,3 +104,9 @@ def load_ds(filename: str, separator: str = ","):
 
     f.close()
     return np.transpose(np.array(vecs)), np.array(labels)
+
+def load_Gender(shuffle = False):
+    DTR, LTR = load_ds("GenderTrain.txt",", ", shuffle=shuffle)
+    DTE, LTE = load_ds("GenderTest.txt", ", ", shuffle=shuffle)
+
+    return (DTR, LTR), (DTE, LTE)

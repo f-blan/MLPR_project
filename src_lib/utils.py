@@ -1,6 +1,18 @@
+from cmath import sqrt
 import numpy as np
 
 
+def compute_Pearson_corr(D: np.ndarray):
+    cov = get_covarianceCentered(D)
+
+    sqrt_vars =np.sqrt( np.var(D, axis = 1) )
+
+    #not very relevant function, implement with loop
+    for y in range(0,cov.shape[0]):
+        for x in range(0,cov.shape[1]):
+            cov[y,x] = cov[y,x]/(sqrt_vars[x]*sqrt_vars[y])
+    
+    return cov
 
 
 def compute_acc(predicted: np.ndarray, real: np.ndarray) -> float:
