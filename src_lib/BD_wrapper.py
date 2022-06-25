@@ -29,6 +29,7 @@ class BD_Wrapper:
         self.n_classes = n_classes
         self.C = C
         self.prior = np.array([1-e_prior, e_prior])
+        print(f"prior is {self.prior}")
 
     
     def train(self, D:np.ndarray, L: np.ndarray) -> None:
@@ -99,6 +100,7 @@ class BD_Wrapper:
         thresholds = np.concatenate([np.array([-np.inf]), thresholds, np.array([np.inf])])
         risks=[]
         best_i = 0
+        best_m = np.zeros((1,1))
 
         for idx, t in enumerate(thresholds):
             m = self.get_matrix_from_threshold(labels,llrs,t)
@@ -106,7 +108,10 @@ class BD_Wrapper:
             risks.append(r)
             if r<=risks[best_i]:
                 best_i = idx
+                best_m = m
 
+
+        print(best_m)
         return min(risks), thresholds[best_i]
     
     def compute_best_threshold_from_Scores(self, S: np.ndarray, L: np.ndarray) -> Tuple[float, float]:
@@ -120,6 +125,7 @@ class BD_Wrapper:
         thresholds = np.concatenate([np.array([-np.inf]), thresholds, np.array([np.inf])])
         risks=[]
         best_i = 0
+        best_m = np.zeros((1,1))
 
         for idx, t in enumerate(thresholds):
             m = self.get_matrix_from_threshold(labels,llrs,t)
@@ -127,7 +133,9 @@ class BD_Wrapper:
             risks.append(r)
             if r<=risks[best_i]:
                 best_i = idx
-
+                best_m = m
+        
+        #print(best_m)
         return min(risks), thresholds[best_i]
 
     def plot_ROC_over_thresholds(self, D: np.ndarray, L:np.ndarray) -> None:

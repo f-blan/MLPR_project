@@ -26,16 +26,16 @@ def MVG_Log_Predict(
     prior: np.ndarray, 
     pars: List[Tuple[np.ndarray, np.ndarray]]) -> Tuple[float, np.ndarray, np.ndarray]:
 
-
     logS= get_score_matrix(D, pars, log_scores=False)
-    logSjoint= logS+ np.log(prior)
+    
+    logSjoint= logS+ np.log(prior)  
     logSMarginal= vrow(sp.special.logsumexp(logSjoint))
     logSPost = logSjoint - logSMarginal
     logPredL = np.argmax(logSPost, axis=0)
     acc, corrects = compute_acc(logPredL, L)
 
 
-    return acc, logPredL, logSPost[1, :]/logSPost[0, :]
+    return acc, logPredL, np.log(logS[1, :]/logS[0, :])
 
 def get_MLE_Gaussian_parameters( D: np.ndarray, L:np.ndarray) -> List[Tuple[np.ndarray, np.ndarray]]:
     pars : List[Tuple[np.ndarray, np.ndarray]] =[]

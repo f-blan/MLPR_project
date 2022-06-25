@@ -82,6 +82,17 @@ class KCV:
             tot_s += LTE.shape[0]
         
         return tot_c/tot_s, whole_S
+
+    
+    def compute_min_dcf(self, model: Model, D: np.ndarray, L:np.ndarray, e_prior: float = 0.5):
+        w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
+        self.model = model
+        acc, whole_S = self.crossValidate(D, L, VERBOSE)
+
+        minDCF, th = w.compute_best_threshold_from_Scores(whole_S, L)
+
+        return minDCF, th
+
     
 
     def find_best_par(self, model: Model, D: np.ndarray, L:np.ndarray, par_index: int, bounds: Tuple[float, float], logBounds: bool = True, logbase: float=10.0, e_prior: float = 0.5, verbose:bool = False, n_vals: int=20) -> Any:

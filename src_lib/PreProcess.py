@@ -96,8 +96,7 @@ class Gaussianize(PreProcess):
             DG[:, i] = np.argmax(self.valMat > vcol(D[:, i]), axis=1)
 
         DG += 1
-
-        DG= DG/(D.shape[1]+2)    
+        DG= np.clip(DG/(D.shape[1]+2), 0, 0.9999)    
         DG = norm.ppf(DG)
         
 
