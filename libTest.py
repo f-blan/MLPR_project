@@ -682,6 +682,20 @@ class LibTest():
         print(L)
         print(TL)
 
+    def test_GAUSS_PCA(self):
+        preproc = Gaussianize()
+        preproc.addNext(PCA(8))
+
+        DTR, LTR = preproc.learn(self.DTR, self.LTR)
+        print(DTR)
+        print(LTR)
+
+    def test_quad_LR(self):
+        l = 10e-6
+        model = QuadLR_Model(2, l, rebalance=False)
+        model.train(self.DTRbin, self.LTRbin)
+        acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
+        print(1-acc)
 
         
         
@@ -705,8 +719,9 @@ if __name__ == "__main__":
     #testClass.test_KCV_N()
     #testClass.test_KCV_T()
     #testClass.test_KCV_NT()
-    #testClass.test_LogReg()
+    testClass.test_LogReg()
     #testClass.test_LogReg_Rebalanced()
+    #testClass.test_quad_LR()
     #testClass.test_SVMNL_RBF()
     #testClass.test_SVMNL_Poly()
     #testClass.test_SVMNL_Poly_Reb()
@@ -729,8 +744,9 @@ if __name__ == "__main__":
     #testClass.test_best_pars_SVMNL_RBF()
     #testClass.test_best_pars_GMM()
     #testClass.test_load_ds()
-    testClass.test_load_shuffle()
-
+    #testClass.test_load_shuffle()
+    #testClass.test_GAUSS_PCA()
+    
 
 
 

@@ -36,11 +36,12 @@ class PCA(PreProcess):
         self. m = m
     
     def _PCA_compute(self, D:np.ndarray)->np.ndarray:
-        return np.dot(self.P.T, D)
+        return np.dot(self.P.T, D- self.mean)
 
     def learn(self, D: np.ndarray, L:np.ndarray)->Tuple[np.ndarray, np.ndarray]:
         C = get_covarianceCentered(D)
         s, U = np.linalg.eigh(C)
+        self.mean = vcol(D.mean(1))
 
         self.P = U[:, ::-1][:, 0:self.m]
 
@@ -123,5 +124,5 @@ class Gaussianize(PreProcess):
         if self.next is None:
             return self._Gauss_compute(D), L
         else:
-            return self.next.apply(self._Gauss_compute, L)
+            return self.next.apply(self._Gauss_compute(D), L)
         
