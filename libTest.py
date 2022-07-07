@@ -545,8 +545,10 @@ class LibTest():
 
         g,l = p.learn(self.DTR, self.LTR)
 
-        #print(g)
-        myHistogram(g, 3, l)
+        t, tl = p.apply(self.DTE, self.LTE)
+
+        print(t)
+        myHistogram(t, 3, tl)
     
     def test_best_pars_LR(self):
         l = 10e-2
@@ -733,7 +735,7 @@ if __name__ == "__main__":
     #testClass.test_LogReg_Rebalanced()
     #testClass.test_quad_LR()
     #testClass.test_SVMNL_RBF()
-    testClass.test_SVMNL_Poly()
+    #testClass.test_SVMNL_Poly()
     #testClass.test_SVMNL_Poly_Reb()
     #testClass.test_SVM_linear()
     #testClass.test_SVM_linear_Reb()
@@ -747,7 +749,7 @@ if __name__ == "__main__":
     #testClass.test_BD_risks()
     #testClass.test_ROC()
     #testClass.test_BE_plot()
-    #testClass.test_Gauss_Preproc()
+    testClass.test_Gauss_Preproc()
     #testClass.test_best_pars_LR()
     #testClass.test_best_pars_SVML()
     #testClass.test_best_pars_SVMNL_Poly()

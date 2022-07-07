@@ -7,7 +7,7 @@ from typing import Tuple
 from src_lib.utils import *
 
 from scipy.stats import norm, rankdata
-import sklearn.preprocessing as skp
+
 
 """
     Classes and methods meant to apply preprocessing of data
@@ -93,29 +93,57 @@ class Gaussianize(PreProcess):
     
     def _Gauss_compute(self, D: np.ndarray) -> np.ndarray:
         DG = np.zeros((D.shape[0], D.shape[1]))
-        
-        for i in range(0, D.shape[1]):
+        if DEBUG_ONLY==False:
             
-            DG[:, i] = np.argmax(self.valMat > vcol(D[:, i]), axis=1)
-
-        DG += 1
-        DG= np.clip(DG/(D.shape[1]+2), 0, 0.9999)    
-        DG = norm.ppf(DG)
         
+            for i in range(0, D.shape[1]):
+                #print(self.valMat)
+                #print([D[:, i]])
+                #print(self.valMat > vcol(D[:, i]))
+                DG[:, i] = np.argmax(self.valMat > vcol(D[:, i]), axis=1)
+                #print(DG[:, i])
+                #assert False == True
 
+            DG += 1
+            DG= np.clip(DG/(self.valMat.shape[1]+2), 0, 0.9999)    
+            DG = norm.ppf(DG)
+        
+        else:
+            for f in range(0, D.shape[0]):
+                for idx,x in enumerate(D[f,:]):
+                    rank = 0
+                    for x_i in self.D[f,:]:
+                        if(x_i < x):
+                            rank += 1
+                    ranks = (rank + 1) /(self.D.shape[1] + 2)
+                    DG[f][idx] = norm.ppf(ranks)
+                    if((norm.ppf(ranks) >=0 or norm.ppf(ranks) <=0) == False):
+                        print(D.shape[1])
+                        print(rank)
+                        print(ranks)
+                        assert False == True
 
+        
         return DG
 
 
     def learn(self, D: np.ndarray, L: np.ndarray) -> Tuple[np.ndarray,np.ndarray]:
-        rank_i = np.argsort(D, axis=1) 
 
-        self.valMat = np.zeros((D.shape[0], D.shape[1]))
+        if DEBUG_ONLY == False:
+            rank_i = np.argsort(D, axis=1) 
 
-        for i in range(0, D.shape[0]):
-            self.valMat[i, :] = D[i, rank_i[i]]
-
+            self.valMat = np.zeros((D.shape[0], D.shape[1]))
+            for i in range(0, D.shape[0]):
+                self.valMat[i, :] = D[i, rank_i[i]]
+        else:
+            self.DTRT = np.zeros((D.shape[0], D.shape[1]))
+            self.D = D
+            for f in range(0,D.shape[0]):
+                self.DTRT[f, :] = norm.ppf(rankdata(D[f, :], method="min")/(D.shape[1] + 2)) 
+            #print(self.DTRT)
+            #assert False == True
         
+
         if self.next is None:
             return self._Gauss_compute(D), L
         else:

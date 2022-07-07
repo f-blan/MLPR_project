@@ -103,6 +103,7 @@ class ExperimentsSVM:
             accuracies.append(accs)
 
             if VERBOSE:
+                # array = [0.5376, 0.5783, 0.6703, 0.6546, 0.7256]
                 plot_vals(minDCFList, vals)
                 plot_vals(accuracies, vals)
 
