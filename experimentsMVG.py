@@ -12,27 +12,7 @@ class ExperimentsMVG:
         self.bal_app = (0.5, np.array([[1,0],[0,1]]))
         self.female_app = (0.9, np.array([[1,0],[0,1]]))
         self.male_app = (0.1, np.array([[1,0],[0,1]]))
-
-    def plot_features_raw(self):
-        myHistogram(self.DTR, 2, self.LTR)
-
-    def plot_features_Gauss(self):
-        preProc = Gaussianize()
-        DTR, LTR = preProc.learn(self.DTR, self.LTR)
-        #print(DTR)
-        if VERBOSE:
-            myHistogram(DTR, 2, LTR)
-    
-    def plot_correlation_mat(self):
-        mat = compute_Pearson_corr(self.DTR)
-        plot_heatmap(mat)
-    
-    def plot_correlation_gauss(self):
-        preproc = Gaussianize()
-        DTR, LTR = preproc.learn(self.DTR, self.LTR)
-        mat = compute_Pearson_corr(DTR)
-
-        plot_heatmap(mat)
+        
     
     def MVG_FC_Raw(self):
         model = MVG_Model(2, False, False)
@@ -46,6 +26,22 @@ class ExperimentsMVG:
             print(f"MINDCF for female MVG_FC_RAW: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_FC_RAW: {minDCFm}, th: {_m}")
             #last res: 0.049 - 0.1206 - 0.1266
+    
+    def MVG_FC_Z(self):
+        preproc = Znorm()
+        model = MVG_Model(2, False, False, preProcess=preproc)
+        kcvw = KCV(model, FOLDS)
+
+        
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_GAUSS: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_GAUSS: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_GAUSS: {minDCFm}, th: {_m}")
+            #last res: 0.049, 0.1206, 0.1266
     
     def MVG_FC_GAUSS(self):
         preproc = Gaussianize()
@@ -79,6 +75,22 @@ class ExperimentsMVG:
             print(f"MINDCF for male MVG_FC_PCA10: {minDCFm}, th: {_m}")
             #last res: 0.0473 - 0.1183 - 0.1393
     
+    def MVG_FC_Z_PCA_10(self):
+        preproc = Znorm()
+        preproc.addNext( PCA(10))
+        model = MVG_Model(2, False, False, preProcess=preproc)
+        kcvw = KCV(model, FOLDS)
+
+        
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_Z_PCA10: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_Z_PCA10: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_Z_PCA10: {minDCFm}, th: {_m}")
+
     def MVG_FC_PCA_8(self):
         preproc = PCA(8)
         model = MVG_Model(2, False, False, preProcess=preproc)
@@ -94,6 +106,23 @@ class ExperimentsMVG:
             print(f"MINDCF for female MVG_FC_PCA8: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_FC_PCA8: {minDCFm}, th: {_m}")
             #last res: 0.0446 - 0.1226 - 0.1403
+    
+    def MVG_FC_Z_PCA_8(self):
+        preproc = Znorm()
+        preproc.addNext( PCA(8))
+        model = MVG_Model(2, False, False, preProcess=preproc)
+        kcvw = KCV(model, FOLDS)
+
+        
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_Z_PCA8: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_Z_PCA8: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_Z_PCA8: {minDCFm}, th: {_m}")
+            #last res: 0.1770 - 0.4210 - 0.4493
     
     def MVG_FC_GAUSS_PCA_8(self):
         preproc = Gaussianize()
@@ -143,6 +172,22 @@ class ExperimentsMVG:
             print(f"MINDCF for male MVG_N_GAUSS: {minDCFm}, th: {_m}")
             #last res: 0.6643 - 0.8730 - 0.9940 # may be much worse because gaussianization destroys correlation between features
     
+    def MVG_N_Z(self):
+        preproc = Znorm()
+        model = MVG_Model(2, False, True, preProcess=preproc)
+        kcvw = KCV(model, FOLDS)
+
+        
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"MINDCF for MVG_N_Z: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_N_Z: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_N_GAUSS: {minDCFm}, th: {_m}")
+            #last res: 0.5653 - 0.8616 - 0.8170
+
     def MVG_N_PCA_10(self):
         preproc = PCA(10)
         model = MVG_Model(2, False, True, preProcess=preproc)
@@ -273,6 +318,22 @@ class ExperimentsMVG:
             print(f"MINDCF for female MVG_T_GAUSS_PCA8: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_T_GAUSS_PCA8: {minDCFm}, th: {_m}")
             #last res: 0.4970 - 0.8496 - 0.9160
+    
+    def random_test(self):
+        preproc1 = PCA(8)
+        preproc1.addNext(Znorm())
+
+        preproc2 = PCA(8)
+
+        model1 = MVG_Model(2, False,False, preProcess=preproc1)
+        model2 = MVG_Model(2, False,False, preProcess=preproc2)
+
+        model1.train(self.DTR, self.LTR)
+        model2.train(self.DTR, self.LTR)
+
+        print(model1.predict(self.DTE, self.LTE)[0])
+        
+        print(model2.predict(self.DTE, self.LTE)[0])
 
 
 
@@ -282,19 +343,17 @@ class ExperimentsMVG:
 
 if __name__ == "__main__":
     exps = ExperimentsMVG("gend")
-
-    #exps.plot_features_raw()
-    #exps.plot_features_Gauss()
-    #exps.plot_correlation_mat()
-    #exps.plot_correlation_mat_PCA()
-    #exps.plot_correlation_gauss()
-
+    
     #exps.MVG_FC_Raw()
+    #exps.MVG_FC_Z()
     #exps.MVG_FC_GAUSS()
     #exps.MVG_FC_PCA_10()
     #exps.MVG_FC_PCA_8()
     #exps.MVG_FC_GAUSS_PCA_8()
+    #exps.MVG_FC_Z_PCA_8()
+    #exps.MVG_FC_Z_PCA_10()
     #exps.MVG_N_Raw()
+    exps.MVG_N_Z()
     #exps.MVG_N_GAUSS()
     #exps.MVG_N_PCA_10()
     #exps.MVG_N_PCA_8()
@@ -304,4 +363,6 @@ if __name__ == "__main__":
     #exps.MVG_T_PCA_10()
     #exps.MVG_T_PCA_8()
     #exps.MVG_T_GAUSS_PCA_8()
+
+    #exps.random_test()
         

@@ -7,10 +7,12 @@ from typing import Tuple
 from src_lib.utils import *
 
 from scipy.stats import norm, rankdata
+import sklearn.preprocessing as skp
 
 """
     Classes and methods meant to apply preprocessing of data
 """
+DEBUG_ONLY = False
 
 class PreProcess:
     def __init__(self, name: str):
@@ -56,7 +58,7 @@ class PCA(PreProcess):
         if self.next is None:
             return self._PCA_compute(D), L
         else:
-            return self.next.apply(self._PCA_compute, L)
+            return self.next.apply(self._PCA_compute(D), L)
 
 class LDA(PreProcess):
     def __init__(self, m: int ):
@@ -125,4 +127,39 @@ class Gaussianize(PreProcess):
             return self._Gauss_compute(D), L
         else:
             return self.next.apply(self._Gauss_compute(D), L)
+
+class Znorm(PreProcess):
+    def __init__(self ):
+        super().__init__("znorm")
+    
+    def _Znorm_compute(self, D: np.ndarray) -> np.ndarray:
+        if DEBUG_ONLY:
+            #this was written for debug only but was not used in the project
+            #print(f"{vcol(D.mean(1))} - {vcol(D.std(1))}")
+            Dn = (D- vcol(D.mean(1)))/vcol(D.std(1))
+            return Dn
+        else:
+            Dn = (D- self.mean)/self.std      
+
+            return Dn
+
+
+    def learn(self, D: np.ndarray, L: np.ndarray) -> Tuple[np.ndarray,np.ndarray]:
+        self.mean = vcol(D.mean(axis = 1))
+        self.std = vcol(np.std(D, axis=1))
+
+        
+
+        
+        if self.next is None:
+            return self._Znorm_compute(D), L
+        else:
+            return self.next.learn(self._Znorm_compute(D), L) 
+
+        
+    def apply(self, D: np.ndarray, L: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        if self.next is None:
+            return self._Znorm_compute(D), L
+        else:
+            return self.next.apply(self._Znorm_compute(D), L)
         

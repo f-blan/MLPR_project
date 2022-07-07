@@ -137,7 +137,7 @@ class GMMLBG_Model(Model):
         acc, corrects = compute_acc(logPredL, L)
 
         #print(logSPost.shape)
-        return acc, logPredL, logS[1, :]/logS[0, :]
+        return acc, logPredL, np.log(logS[1, :]/logS[0, :])
 
 
 class GMMLBG_Diag_Model(GMMLBG_Model):

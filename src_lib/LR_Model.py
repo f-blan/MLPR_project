@@ -45,9 +45,10 @@ class LRBinary_Model(Model):
         self.z = L.copy()
         self.z[L==0]=-1
         
+        self.nT = (L == 1).sum()
+        self.nF = (L == 0).sum()
         if self.rebalance:
-            self.nT = (L == 1).sum()
-            self.nF = (L == 0).sum()
+            
             self.Dt = D[:,L == 1]
             self.Df = D[:,L == 0]
             print(f"nT = {self.nT}, nF = {self.nF}, prior= {self.prior}")
@@ -65,7 +66,7 @@ class LRBinary_Model(Model):
         true = L >0
         acc=np.sum(preds==true)/preds.shape[1]
 
-        return acc, preds, np.reshape(S, (S.shape[1]))
+        return acc, preds, np.reshape(S- np.log(self.nT/self.nF), (S.shape[1]))
 
 
 class QuadLR_Model(LRBinary_Model):
@@ -120,10 +121,9 @@ class QuadLR_Model(LRBinary_Model):
         
         self.z = L.copy()
         self.z[L==0]=-1
-        
+        self.nT = (L == 1).sum()
+        self.nF = (L == 0).sum()
         if self.rebalance:
-            self.nT = (L == 1).sum()
-            self.nF = (L == 0).sum()
             self.Dt = D[:,L == 1]
             self.Df = D[:,L == 0]
             print(f"nT = {self.nT}, nF = {self.nF}, prior= {self.prior}")
@@ -142,4 +142,4 @@ class QuadLR_Model(LRBinary_Model):
         true = L >0
         acc=np.sum(preds==true)/preds.shape[1]
 
-        return acc, preds, np.reshape(S, (S.shape[1]))
+        return acc, preds, np.reshape(S - np.log(self.nT/self.nF), (S.shape[1])) #subrtract prior log odds to get llrs

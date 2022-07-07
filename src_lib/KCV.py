@@ -126,7 +126,7 @@ class KCV:
         if type(model).__name__ == "MVG_Model":
             print("No hyperparams for mvg model, aborting")
             return
-        elif type(model).__name__ == "LRBinary_Model":
+        elif type(model).__name__ == "LRBinary_Model" or type(model).__name__ == "QuadLR_Model":
             get_next_par = get_next_LR
         elif type(model).__name__ == "SVMNL_Model" or type(model).__name__ == "SVML_Model":
             get_next_par =  get_next_SVM_C if par_index == 1  else  get_next_SVM_K

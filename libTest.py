@@ -696,6 +696,16 @@ class LibTest():
         model.train(self.DTRbin, self.LTRbin)
         acc, preds, S = model.predict(self.DTEbin, self.LTEbin)
         print(1-acc)
+    
+    def test_Znorm(self):
+        preproc = Znorm()
+
+        DTR, LTR = preproc.learn(self.DTR, self.LTR)
+
+        print(DTR.mean(1))
+        print(DTR.std(1))
+
+        myHistogram(DTR, 2, LTR)
 
         
         
@@ -719,11 +729,11 @@ if __name__ == "__main__":
     #testClass.test_KCV_N()
     #testClass.test_KCV_T()
     #testClass.test_KCV_NT()
-    testClass.test_LogReg()
+    #testClass.test_LogReg()
     #testClass.test_LogReg_Rebalanced()
     #testClass.test_quad_LR()
     #testClass.test_SVMNL_RBF()
-    #testClass.test_SVMNL_Poly()
+    testClass.test_SVMNL_Poly()
     #testClass.test_SVMNL_Poly_Reb()
     #testClass.test_SVM_linear()
     #testClass.test_SVM_linear_Reb()
@@ -746,6 +756,8 @@ if __name__ == "__main__":
     #testClass.test_load_ds()
     #testClass.test_load_shuffle()
     #testClass.test_GAUSS_PCA()
+    #testClass.test_Znorm()
+
     
 
 

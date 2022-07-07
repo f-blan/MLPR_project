@@ -6,6 +6,9 @@ from scipy.optimize import fmin_l_bfgs_b
 
 from src_lib import *
 
+
+VERBOSE = False
+PRINT = False
 class Kernel:
     def __init__(self, kname: str = "Mat", d: int=2, c: float=0.0, gamma: float = 1.0):
         self.kname = kname
@@ -55,7 +58,7 @@ class SVMNL_Model(Model):
         L = 0.5*np.dot(np.dot(a.T, self.H), a)- np.dot(a.T, vcol(np.ones((a.shape[0]))))
 
         Lgrad = (np.dot(self.H, a) - vcol(np.ones((a.shape[0])))).reshape((a.shape[0]))
-        
+        #print(L)
         return (L, Lgrad)
 
     def train(self, D: np.ndarray, L: np.ndarray):
@@ -78,7 +81,9 @@ class SVMNL_Model(Model):
             Cf = (self.C*self.prior[1])/(L==0).mean()
             boundsList = [(0, Ct if label == 1 else Cf) for label in L]
         
-        x,f,d=fmin_l_bfgs_b(self._compute_L, x0, iprint=0, bounds= boundsList, factr= 1.0, maxiter = 100000, maxfun = 100000)
+        x,f,d=fmin_l_bfgs_b(self._compute_L, x0, iprint=0, bounds= boundsList, factr= 1000000.0, maxiter = 30000, maxfun = 30000)
+        if PRINT:
+            print(f">>train done {d}, >>>>>>>last val: {f}")
         self.alphas = x
 
 
@@ -143,8 +148,11 @@ class SVML_Model(Model):
             boundsList = [(0, Ct if label == 1 else Cf) for label in L]
         #print(boundsList)
         
-        x,f,d=fmin_l_bfgs_b(self._compute_L, x0, iprint=0, bounds= boundsList, factr= 1.0, maxiter = 100000, maxfun = 100000)
+        x,f,d=fmin_l_bfgs_b(self._compute_L, x0, iprint=0, bounds= boundsList, factr= 100000000.0, maxiter = 10000, maxfun = 10000)
         self.alphas = x
+
+        if VERBOSE:
+            print(f"finished training, final loss = {f}")
 
         Dcz = Dc*Lz
         self.w = np.dot(Dcz, vcol(self.alphas))
