@@ -4,9 +4,9 @@ from src_lib.GMM_Model import GMMLBG_Model, GMMLBG_Tied_Model
 from src_lib.SVM_Model import Kernel
 
 FOLDS = 5
-VERBOSE = True
+VERBOSE = False
 
-class ExperimentsSVM:
+class ExperimentsGMM:
     def __init__(self, dataName: str):
         if dataName == "gend":
             (self.DTR, self.LTR), (self.DTE, self.LTE) = load_Gender(shuffle=True)
@@ -39,6 +39,7 @@ class ExperimentsSVM:
 
         plot_vals(minDCFList, vals)
         plot_vals(accuracies, vals)
+        #0.0440 - 0.1196 - 0.1166
     
     def find_best_K_FC_PCA8(self):
         
@@ -50,6 +51,34 @@ class ExperimentsSVM:
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
         minDCFList.append(minDCFs)
         accuracies.append(accs)
+
+        model = GMMLBG_Model(2,1e-2, 1,preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.female_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Model(2,1e-2, 1, preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.male_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        plot_vals(minDCFList, vals)
+        plot_vals(accuracies, vals)
+
+    def find_best_K_FC_Gauss(self):
+        
+        minDCFList = []
+        accuracies = []
+        preproc = Gaussianize()
+        model = GMMLBG_Model(2,1e-2, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        print(model.n_gauss_exp())
 
         model = GMMLBG_Model(2,1e-2, 1,preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
         kcv = KCV(model, 5)
@@ -117,3 +146,38 @@ class ExperimentsSVM:
 
         plot_vals(minDCFList, vals)
         plot_vals(accuracies, vals)
+
+    
+    def find_best_K_T_Gauss(self):
+        
+        minDCFList = []
+        accuracies = []
+        preproc = Gaussianize()
+        
+        model = GMMLBG_Tied_Model(2,1e-2, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Tied_Model(2,1e-2, 1,preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.female_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Tied_Model(2,1e-2, 1, preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.male_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        plot_vals(minDCFList, vals)
+        plot_vals(accuracies, vals)
+
+if __name__ == "__main__":
+    exps = ExperimentsGMM("gend")
+
+    #exps.find_best_K_FC_raw()
+    exps.find_best_K_FC_Gauss()
+    exps.find_best_K_FC_PCA8()
