@@ -49,6 +49,35 @@ class ExperimentsSVM:
 
         plot_vals(minDCFList, vals)
 
+    def find_best_C_L_Gauss(self):
+        minDCFList = []
+        accuracies = []
+        preproc = Gaussianize()
+        model = SVML_Model(2, 1, 0.1, preProcess= preproc)
+
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+        
+        model = SVML_Model(2, 1, 0.1, preProcess= preproc)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.female_app[0], n_vals=5)
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        
+        model = SVML_Model(2, 1, 0.1, preProcess= preproc)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.male_app[0], n_vals=5)
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        if VERBOSE:
+            plot_vals(minDCFList, vals)
+            plot_vals(accuracies, vals)
+            # 0.0550 - 0.1586 - 0.1566
+    
 
 
     def find_best_C_L_PCA8(self):
@@ -106,6 +135,36 @@ class ExperimentsSVM:
                 # array = [0.5376, 0.5783, 0.6703, 0.6546, 0.7256]
                 plot_vals(minDCFList, vals)
                 plot_vals(accuracies, vals)
+
+    def find_best_C_Quad_Gauss(self):
+            minDCFList = []
+            accuracies = []
+            kernel = Kernel(kname="poly2", c = 1)
+            
+            preproc = Gaussianize()
+            model = SVMNL_Model(2, 0, 0.1, kernel=kernel, preProcess=preproc)
+            kcv = KCV(model, 5)
+            minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
+            minDCFList.append(minDCFs)
+            accuracies.append(accs)
+        
+            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            kcv = KCV(model, 5)
+            minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.female_app[0], n_vals=5)
+            minDCFList.append(minDCFs)
+            accuracies.append(accs)
+
+       
+            model = SVMNL_Model(2, 1, 0.1, kernel= kernel, preProcess= preproc)
+            kcv = KCV(model, 5)
+            minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.male_app[0], n_vals=5)
+            minDCFList.append(minDCFs)
+            accuracies.append(accs)
+
+            if VERBOSE:
+                plot_vals(minDCFList, vals)
+                plot_vals(accuracies, vals)
+                # 0.0546 - 0.1506 - 0.1670 
 
     def find_best_C_Quad_PCA8(self):
             minDCFList = []
@@ -206,6 +265,40 @@ class ExperimentsSVM:
 
         plot_vals(minDCFList, vals)
     
+    def find_best_C_RBF_Gauss_bal(self):
+            minDCFList = []
+            accuracies = []
+            kernel = Kernel(kname="RBF", gamma = 0.001)
+            preproc = Gaussianize()
+            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            kcv = KCV(model, 5)
+            minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
+            minDCFList.append(minDCFs)
+            accuracies.append(accs)
+
+            
+            kernel = Kernel(kname="RBF", gamma = 0.01)
+            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            kcv = KCV(model, 5)
+            minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
+            minDCFList.append(minDCFs)
+            accuracies.append(accs)
+
+
+            
+            kernel = Kernel(kname="RBF", gamma = 0.1)
+            model = SVMNL_Model(2, 1, 0.1, kernel= kernel, preProcess=preproc)
+            kcv = KCV(model, 5)
+            minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
+            minDCFList.append(minDCFs)
+            accuracies.append(accs)
+
+            if VERBOSE:
+                plot_vals(minDCFList, vals)
+                plot_vals(accuracies, vals)
+                #0.2870 - 0.0996 - 0.0673
+    
+
     def find_best_C_RBF_raw_female(self):
         minDCFList = []
         accuracies = []
@@ -338,12 +431,15 @@ if __name__ == "__main__":
     #exps.find_best_C_L()
     #exps.plot_C_L()
     #exps.find_best_C_L_PCA8()
+    #exps.find_best_C_L_Gauss()
     #exps.find_best_C_Quad_PCA8()
     #exps.find_best_C_RBF_PCA8_bal()
     #exps.plot_RBF_pca8_bal()
-    exps.find_best_C_Quad_raw()
+    #exps.find_best_C_Quad_raw()
+    #exps.find_best_C_Quad_Gauss()
     #exps.find_best_C_RBF_raw_bal()
     #exps.find_best_C_RBF_raw_female()
     #exps.find_best_C_RBF_PCA8_female()
     #exps.find_best_C_RBF_raw_male()
     #exps.find_best_C_RBF_PCA8_male()
+    exps.find_best_C_RBF_Gauss_bal()

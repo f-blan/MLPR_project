@@ -97,12 +97,13 @@ class Gaussianize(PreProcess):
             
         
             for i in range(0, D.shape[1]):
-                #print(self.valMat)
-                #print([D[:, i]])
-                #print(self.valMat > vcol(D[:, i]))
-                DG[:, i] = np.argmax(self.valMat > vcol(D[:, i]), axis=1)
-                #print(DG[:, i])
-                #assert False == True
+                gm = self.valMat > vcol(D[:, i])
+                DG[:, i] = np.argmax(gm, axis=1)
+                
+                #the above code returns rank 0 if the value is greater than any other in the valmat
+                DG[ np.any(gm, axis=1)==False, i] = self.valMat.shape[1]+1
+                
+                
 
             DG += 1
             DG= np.clip(DG/(self.valMat.shape[1]+2), 0, 0.9999)    

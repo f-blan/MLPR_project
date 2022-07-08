@@ -9,8 +9,8 @@ from typing import Tuple
 from scipy.optimize import fmin_l_bfgs_b
 
 class LRBinary_Model(Model):
-    def __init__(self, n_classes: int,  reg_lambda:float, preProcess: PreProcess = PreProcess("None"), rebalance = False):
-        super().__init__(n_classes, preProcess=preProcess)
+    def __init__(self, n_classes: int,  reg_lambda:float, preProcess: PreProcess = PreProcess("None"), rebalance = False, prior: np.ndarray = -np.ones(1)):
+        super().__init__(n_classes, preProcess=preProcess, prior= prior)
         self.reg_lambda = reg_lambda
         self.rebalance = rebalance
     
@@ -51,7 +51,7 @@ class LRBinary_Model(Model):
             
             self.Dt = D[:,L == 1]
             self.Df = D[:,L == 0]
-            print(f"nT = {self.nT}, nF = {self.nF}, prior= {self.prior}")
+            #print(f"nT = {self.nT}, nF = {self.nF}, prior= {self.prior}")
 
         x0 = np.zeros((D.shape[0]+1))
         x,f,d=fmin_l_bfgs_b(self._logRegFun, x0, approx_grad = True, iprint=0)
@@ -66,7 +66,7 @@ class LRBinary_Model(Model):
         true = L >0
         acc=np.sum(preds==true)/preds.shape[1]
 
-        return acc, preds, np.reshape(S- np.log(self.nT/self.nF), (S.shape[1]))
+        return acc, preds,  np.reshape(S- np.log(self.nT/self.nF), (S.shape[1])) if self.rebalance == False else np.reshape(S- np.log(self.prior[1]/self.prior[0]), (S.shape[1])) 
 
 
 class QuadLR_Model(LRBinary_Model):
