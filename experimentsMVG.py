@@ -57,7 +57,7 @@ class ExperimentsMVG:
             print(f"MINDCF for MVG_FC_GAUSS: {minDCF}, th: {_}")
             print(f"MINDCF for female MVG_FC_GAUSS: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_FC_GAUSS: {minDCFm}, th: {_m}")
-            #last res: 0.627 - 0.953 - 0.998 # may be much worse because gaussianization destroys correlation between features
+            #last res: 0.0613 - 0.1773 - 0.1856 
     
     def MVG_FC_PCA_10(self):
         preproc = PCA(10)
@@ -140,7 +140,7 @@ class ExperimentsMVG:
             print(f"MINDCF for MVG_FC_GAUSS_PCA8: {minDCF}, th: {_}")
             print(f"MINDCF for female MVG_FC_GAUSS_PCA8: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_FC_GAUSS_PCA8: {minDCFm}, th: {_m}")
-            #last res: 0.4993 - 0.8640 - 0.9230
+            #last res: 0.1663 - 0.4233 - 0.4380
             
     
     def MVG_N_Raw(self):
@@ -170,7 +170,7 @@ class ExperimentsMVG:
             print(f"MINDCF for MVG_N_GAUSS: {minDCF}, th: {_}")
             print(f"MINDCF for female MVG_N_GAUSS: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_N_GAUSS: {minDCFm}, th: {_m}")
-            #last res: 0.6643 - 0.8730 - 0.9940 # may be much worse because gaussianization destroys correlation between features
+            #last res: 0.5409 - 0.8356 - 0.8029
     
     def MVG_N_Z(self):
         preproc = Znorm()
@@ -237,7 +237,7 @@ class ExperimentsMVG:
             print(f"MINDCF for MVG_N_GAUSS_PCA8: {minDCF}, th: {_}")
             print(f"MINDCF for female MVG_N_GAUSS_PCA8: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_N_GAUSS_PCA8: {minDCFm}, th: {_m}")
-            #last res: 0.5176 - 0.8886 - 0.9346
+            #last res: 0.1720 - 0.4240 - 0.4486
         
     
     def MVG_T_Raw(self):
@@ -267,7 +267,7 @@ class ExperimentsMVG:
             print(f"MINDCF for MVG_T_GAUSS: {minDCF}, th: {_}")
             print(f"MINDCF for female MVG_T_GAUSS: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_T_GAUSS: {minDCFm}, th: {_m}")
-            #last res: 0.5503 - 0.9133 - 0.958
+            #last res: 0.0593 - 0.1646 - 0.1790
     
     def MVG_T_PCA_10(self):
         preproc = PCA(10)
@@ -317,7 +317,7 @@ class ExperimentsMVG:
             print(f"MINDCF for MVG_T_GAUSS_PCA8: {minDCF}, th: {_}")
             print(f"MINDCF for female MVG_T_GAUSS_PCA8: {minDCFf}, th: {_f}")
             print(f"MINDCF for male MVG_T_GAUSS_PCA8: {minDCFm}, th: {_m}")
-            #last res: 0.4970 - 0.8496 - 0.9160
+            #last res: 0.1643 - 0.4076 - 0.4323
     
     def random_test(self):
         preproc1 = PCA(8)
