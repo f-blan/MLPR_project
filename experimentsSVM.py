@@ -5,6 +5,9 @@ from src_lib.SVM_Model import Kernel
 FOLDS = 5
 VERBOSE = True
 
+KL = 1
+KNL = 0
+
 class ExperimentsSVM:
     def __init__(self, dataName: str):
         if dataName == "gend":
@@ -17,20 +20,20 @@ class ExperimentsSVM:
     def find_best_C_L_raw(self):
         minDCFList = []
         accuracies = []
-        model = SVML_Model(2, 1, 0.1)
+        model = SVML_Model(2, KL, 0.1)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
         minDCFList.append(minDCFs)
         accuracies.append(accs)
         
-        model = SVML_Model(2, 1, 0.1)
+        model = SVML_Model(2, K, 0.1)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.female_app[0], n_vals=5)
         minDCFList.append(minDCFs)
         accuracies.append(accs)
 
         
-        model = SVML_Model(2, 1, 0.1)
+        model = SVML_Model(2, K, 0.1)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.male_app[0], n_vals=5)
         minDCFList.append(minDCFs)
@@ -84,19 +87,19 @@ class ExperimentsSVM:
             minDCFList = []
             accuracies = []
             preproc = PCA(8)
-            model = SVML_Model(2, 1, 0.1, preProcess=preproc)
+            model = SVML_Model(2, KL, 0.1, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
             accuracies.append(accs)
         
-            model = SVML_Model(2, 1, 0.1, preProcess=preproc)
+            model = SVML_Model(2, KL, 0.1, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.female_app[0], n_vals=5)
             minDCFList.append(minDCFs)
             accuracies.append(accs)
 
-            model = SVML_Model(2, 1, 0.1, preProcess=preproc)
+            model = SVML_Model(2, KL, 0.1, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.male_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -199,7 +202,7 @@ class ExperimentsSVM:
         accuracies = []
         kernel = Kernel(kname="RBF", gamma = 0.001)
             
-        model = SVMNL_Model(2, 1, 0.1, kernel=kernel)    
+        model = SVMNL_Model(2, KNL, 0.1, kernel=kernel)    
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
         minDCFList.append(minDCFs)
@@ -207,7 +210,7 @@ class ExperimentsSVM:
 
             
         kernel = Kernel(kname="RBF", gamma = 0.01)
-        model = SVMNL_Model(2, 1, 0.1, kernel=kernel)
+        model = SVMNL_Model(2, KNL, 0.1, kernel=kernel)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
         minDCFList.append(minDCFs)
@@ -215,7 +218,7 @@ class ExperimentsSVM:
 
             
         kernel = Kernel(kname="RBF", gamma = 0.1)
-        model = SVMNL_Model(2, 1, 0.1, kernel= kernel)
+        model = SVMNL_Model(2, KNL, 0.1, kernel= kernel)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
         minDCFList.append(minDCFs)
@@ -231,7 +234,7 @@ class ExperimentsSVM:
             accuracies = []
             kernel = Kernel(kname="RBF", gamma = 0.001)
             preproc = PCA(8)
-            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel=kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -239,7 +242,7 @@ class ExperimentsSVM:
 
             
             kernel = Kernel(kname="RBF", gamma = 0.01)
-            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel=kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -248,7 +251,7 @@ class ExperimentsSVM:
 
             
             kernel = Kernel(kname="RBF", gamma = 0.1)
-            model = SVMNL_Model(2, 1, 0.1, kernel= kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel= kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -257,6 +260,7 @@ class ExperimentsSVM:
             if VERBOSE:
                 plot_vals(minDCFList, vals)
                 plot_vals(accuracies, vals)
+                #0.0543 - 0.0516 - 0.1846
     
     def plot_RBF_pca8_bal(self):
         #for some reason plot didn't work
@@ -298,6 +302,28 @@ class ExperimentsSVM:
                 plot_vals(accuracies, vals)
                 #0.2870 - 0.0996 - 0.0673
     
+
+    def find_RBF_raw_mf_best_pars(self):
+        
+        kernel = Kernel(kname="RBF", gamma = 0.01)
+        model = SVMNL_Model(2, KNL, 20, kernel=kernel)
+        kcv = KCV(model, 5)
+        dcfb, th = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+            
+        model = SVMNL_Model(2, KNL, 20, kernel=kernel)
+        kcv = KCV(model, 5)
+        dcff, th = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+
+        model = SVMNL_Model(2, KNL, 20, kernel=kernel)
+        kcv = KCV(model, 5)
+        dcfm, th = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"minDCF for RBF C = 20 and gamma = 0.1 bal : {dcfb}") 
+            print(f"minDCF for RBF C = 20 and gamma = 0.1 female : {dcff}")
+            print(f"minDCF for RBF C = 20 and gamma = 0.1 male : {dcfm}")
+        
+
 
     def find_best_C_RBF_raw_female(self):
         minDCFList = []
@@ -428,18 +454,22 @@ class ExperimentsSVM:
 if __name__ == "__main__":
     exps = ExperimentsSVM("gend")
 
-    #exps.find_best_C_L()
+    #exps.find_best_C_L_raw()
     #exps.plot_C_L()
     #exps.find_best_C_L_PCA8()
     #exps.find_best_C_L_Gauss()
+
     #exps.find_best_C_Quad_PCA8()
-    #exps.find_best_C_RBF_PCA8_bal()
+    exps.find_best_C_RBF_PCA8_bal()
     #exps.plot_RBF_pca8_bal()
     #exps.find_best_C_Quad_raw()
     #exps.find_best_C_Quad_Gauss()
+
     #exps.find_best_C_RBF_raw_bal()
+    #exps.find_RBF_raw_mf_best_pars()
     #exps.find_best_C_RBF_raw_female()
+
     #exps.find_best_C_RBF_PCA8_female()
     #exps.find_best_C_RBF_raw_male()
     #exps.find_best_C_RBF_PCA8_male()
-    exps.find_best_C_RBF_Gauss_bal()
+    #exps.find_best_C_RBF_Gauss_bal()

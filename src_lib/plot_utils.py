@@ -5,7 +5,7 @@ import itertools as itt
 from typing import List
 
 def myHistogram(data: np.ndarray,n_labels:int,labels:np.ndarray, bins: int=20):
-    colors = ["red", "green", "yellow", "blue", "gray", "orange"]
+    colors = ["red", "green", "blue","yellow" , "gray", "orange"]
 
     for i in range(0,data.shape[0]):
         for j in range(0,n_labels):
@@ -13,7 +13,7 @@ def myHistogram(data: np.ndarray,n_labels:int,labels:np.ndarray, bins: int=20):
         plt.show()
 
 def plot_vals(dataY: List[List[float]], dataX: List[float], logplot: bool = True):
-    colors = ["red", "green", "yellow", "blue", "gray", "orange"]
+    colors = ["red", "green", "blue","yellow" , "gray", "orange"]
 
     for i, app in enumerate(dataY):
         plt.semilogx( dataX, app, color= colors[i])
