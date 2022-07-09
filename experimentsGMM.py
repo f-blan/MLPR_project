@@ -197,6 +197,7 @@ class ExperimentsGMM:
         if VERBOSE:
             plot_vals(minDCFList, vals)
             plot_vals(accuracies, vals)
+            #0.0579 - 0.1406 - 0.1669
     
     def find_best_K_N_raw(self):
         

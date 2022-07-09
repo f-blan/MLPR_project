@@ -101,6 +101,7 @@ class KCV:
             par_vals = np.logspace(bounds[0], bounds[1], num=n_vals, base=logbase)
         else:
             par_vals = np.linspace(bounds[0], bounds[1], num=n_vals)
+
         
         def get_next_LR(val_index):
             model.reg_lambda = par_vals[val_index]
