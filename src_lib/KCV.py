@@ -9,6 +9,7 @@ from src_lib.Model import Model
 import numpy as np
 from typing import Any, List, Tuple
 import math
+import random as r
 
 VERBOSE=False
 
@@ -93,7 +94,55 @@ class KCV:
 
         return minDCF, th
 
+    def compute_actual_dcf(self, model: Model, D: np.ndarray, L: np.ndarray, e_prior: float = 0.5, th: float = None):
+        w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
+        self.model = model
+        acc, whole_S = self.crossValidate(D, L, VERBOSE)
+        if th is None:
+            th = w.get_theoretical_threshold()
+        confusion_m = w.get_matrix_from_threshold(L, whole_S, th)
+        
+        actDcf = w.get_norm_risk(confusion_m)
+
+        return actDcf, th
     
+    def threshold_estimate(self, model: Model, D: np.ndarray, L: np.ndarray, e_prior: float = 0.5 ):
+        w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
+        self.model = model
+        acc, whole_S = self.crossValidate(D, L, VERBOSE)
+
+        shuffled_zip = zip(whole_S, L)
+        length = len(shuffled_zip)
+        r.Random(5).shuffle(shuffled_zip)
+
+        t_split = shuffled_zip[0: length/2]
+        v_split = shuffled_zip[ length/2: ]
+
+        _, best_th = w.compute_best_threshold_from_Scores(t_split[0], t_split[1])
+
+        theory_th = w.get_theoretical_threshold()
+        
+        minDCF, _ = w.compute_best_threshold_from_Scores(v_split[0], v_split[1])
+
+        confusion_m = w.get_matrix_from_threshold(v_split[1], v_split[0], theory_th)
+        theory_actDCF = w.get_norm_risk(confusion_m)
+
+        confusion_m = w.get_matrix_from_threshold(v_split[1], v_split[0], best_th)
+        estimate_th_actDCF = w.get_norm_risk(confusion_m)
+
+        return minDCF, theory_actDCF, estimate_th_actDCF, best_th
+
+
+        
+
+    def compute_bayes_pars(self, model: Model, D: np.ndarray, L: np.ndarray):
+        w=BD_Wrapper("Static", 2, model=model)
+        self.model = model
+        acc, whole_S = self.crossValidate(D, L, VERBOSE)
+
+        return w.plot_Bayes_errors_from_scores(whole_S, L, plot= True)
+
+
 
     def find_best_par(self, model: Model, D: np.ndarray, L:np.ndarray, par_index: int, bounds: Tuple[float, float], logBounds: bool = True, logbase: float=10.0, e_prior: float = 0.5, verbose:bool = False, n_vals: int=20) -> Any:
         

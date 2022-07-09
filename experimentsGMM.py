@@ -383,6 +383,6 @@ if __name__ == "__main__":
     #exps.find_best_K_N_raw()
     #exps.find_best_K_N_PCA8()
     #exps.find_best_K_N_Gauss()
-    exps.find_best_K_NT_raw()
-    exps.find_best_K_NT_PCA8()
+    #exps.find_best_K_NT_raw()
+    #exps.find_best_K_NT_PCA8()
     exps.find_best_K_NT_Gauss()

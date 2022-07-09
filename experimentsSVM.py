@@ -145,20 +145,20 @@ class ExperimentsSVM:
             kernel = Kernel(kname="poly2", c = 1)
             
             preproc = Gaussianize()
-            model = SVMNL_Model(2, 0, 0.1, kernel=kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel=kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
             accuracies.append(accs)
         
-            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel=kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.female_app[0], n_vals=5)
             minDCFList.append(minDCFs)
             accuracies.append(accs)
 
        
-            model = SVMNL_Model(2, 1, 0.1, kernel= kernel, preProcess= preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel= kernel, preProcess= preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.male_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -274,7 +274,7 @@ class ExperimentsSVM:
             accuracies = []
             kernel = Kernel(kname="RBF", gamma = 0.001)
             preproc = Gaussianize()
-            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel=kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -282,7 +282,7 @@ class ExperimentsSVM:
 
             
             kernel = Kernel(kname="RBF", gamma = 0.01)
-            model = SVMNL_Model(2, 1, 0.1, kernel=kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel=kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -291,7 +291,7 @@ class ExperimentsSVM:
 
             
             kernel = Kernel(kname="RBF", gamma = 0.1)
-            model = SVMNL_Model(2, 1, 0.1, kernel= kernel, preProcess=preproc)
+            model = SVMNL_Model(2, KNL, 0.1, kernel= kernel, preProcess=preproc)
             kcv = KCV(model, 5)
             minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.bal_app[0], n_vals=5)
             minDCFList.append(minDCFs)
@@ -302,6 +302,24 @@ class ExperimentsSVM:
                 plot_vals(accuracies, vals)
                 #0.2870 - 0.0996 - 0.0673
     
+    def find_RBF_Gauss_mf_best_pars(self):
+        kernel = Kernel(kname="RBF", gamma = 0.1)
+        model = SVMNL_Model(2, KNL, 0.001, kernel=kernel)
+        kcv = KCV(model, 5)
+        dcfb, th = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+            
+        model = SVMNL_Model(2, KNL, 0.001, kernel=kernel)
+        kcv = KCV(model, 5)
+        dcff, th = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+
+        model = SVMNL_Model(2, KNL, 0.001, kernel=kernel)
+        kcv = KCV(model, 5)
+        dcfm, th = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"minDCF for RBF C = 20 and gamma = 0.1 bal : {dcfb}") 
+            print(f"minDCF for RBF C = 20 and gamma = 0.1 female : {dcff}")
+            print(f"minDCF for RBF C = 20 and gamma = 0.1 male : {dcfm}")
 
     def find_RBF_raw_mf_best_pars(self):
         
@@ -460,7 +478,7 @@ if __name__ == "__main__":
     #exps.find_best_C_L_Gauss()
 
     #exps.find_best_C_Quad_PCA8()
-    exps.find_best_C_RBF_PCA8_bal()
+    #exps.find_best_C_RBF_PCA8_bal()
     #exps.plot_RBF_pca8_bal()
     #exps.find_best_C_Quad_raw()
     #exps.find_best_C_Quad_Gauss()
@@ -473,3 +491,4 @@ if __name__ == "__main__":
     #exps.find_best_C_RBF_raw_male()
     #exps.find_best_C_RBF_PCA8_male()
     #exps.find_best_C_RBF_Gauss_bal()
+    exps.find_RBF_Gauss_mf_best_pars()

@@ -77,6 +77,10 @@ class BD_Wrapper:
 
         if VERBOSE: print(f"minDCF: {risk/opt_risk}, acc: {(M[0,0]+M[1,1])/(M.sum())}")
         return risk/opt_risk
+    
+    def get_theoretical_threshold(self):
+        return -np.log((self.prior[1]*self.C[0, 1])/(self.prior[0]*self.C[1,0]))
+
 
     def get_matrix_from_threshold(self, L:np.ndarray, llrs:np.ndarray, th: float) -> np.ndarray:
         predL = np.int32(llrs > th)
@@ -161,7 +165,7 @@ class BD_Wrapper:
         plt.plot(FNRs, TPRs )
         plt.show()
 
-    def plot_Bayes_errors(self, D, L) -> None:
+    def plot_Bayes_errors(self, D : np.ndarray, L: np.ndarray, plot: bool = True) -> Tuple[np.ndarray, List[float], List[float]]:
         _, __, llrs =   self.model.predict(D,L)
         labels = L
         
@@ -186,12 +190,52 @@ class BD_Wrapper:
         #DCFs.reverse()
         
         #minDCFs.reverse()
-        plt.plot(priorLogOdds, DCFs, label='DCF', color= 'r')
 
-        plt.plot(priorLogOdds, minDCFs, label='minDCF', color= 'b')
-        plt.ylim([0, 1.1])
-        plt.xlim([-3,3])
-        plt.show()
+        if plot:
+            plt.plot(priorLogOdds, DCFs, label='DCF', color= 'r')
+
+            plt.plot(priorLogOdds, minDCFs, label='minDCF', color= 'b')
+            plt.ylim([0, 1.1])
+            plt.xlim([-3,3])
+            plt.show()
+        
+        return priorLogOdds, DCFs, minDCFs
+
+    def plot_Bayes_errors_from_scores(self, llrs : np.ndarray, L: np.ndarray, plot: bool = True) -> Tuple[np.ndarray, List[float], List[float]]:
+        #_, __, llrs =   self.model.predict(D,L)
+        labels = L
+        
+        #llrs = np.log(Post[1, :]/Post[0, :])
+        old_prior = self.prior
+        priorLogOdds = np.linspace(-3, 3, 21)
+        DCFs = []
+        minDCFs = [] 
+        for idx, p in enumerate(priorLogOdds):
+            effectiveP = 1/(1+np.exp(-p))
+            th = -np.log((effectiveP)/(1-effectiveP))
+            
+            self.prior = np.array([(1-effectiveP), effectiveP])
+            m = self.get_matrix_from_threshold(labels, llrs, th=th)
+            
+
+            DCFs.append(self.get_norm_risk(m))
+            minDCFs.append(self.compute_best_threshold(D,L)[0])
+
+        self.prior = old_prior        
+        
+        #DCFs.reverse()
+        
+        #minDCFs.reverse()
+
+        if plot:
+            plt.plot(priorLogOdds, DCFs, label='DCF', color= 'r')
+
+            plt.plot(priorLogOdds, minDCFs, label='minDCF', color= 'b')
+            plt.ylim([0, 1.1])
+            plt.xlim([-3,3])
+            plt.show()
+        
+        return priorLogOdds, DCFs, minDCFs
 
     def checker(self, th: float = None) -> Tuple[float, np.ndarray]:
         if th == None:
