@@ -131,7 +131,7 @@ class KCV:
             get_next_par = get_next_LR
         elif type(model).__name__ == "SVMNL_Model" or type(model).__name__ == "SVML_Model":
             get_next_par =  get_next_SVM_C if par_index == 1  else  get_next_SVM_K
-        elif type(model).__name__ == "GMMLBG_Model" or type(model).__name__ == "GMMLBG_Diag_Model" or type(model).__name__ == "GMMLBG_Tied_Model":
+        elif type(model).__name__ == "GMMLBG_Model" or type(model).__name__ == "GMMLBG_Diag_Model" or type(model).__name__ == "GMMLBG_Tied_Model" or type(model).__name__ == "GMMLBG_DT_Model":
             get_next_par =  get_next_GMM_exp if par_index == 0 else get_next_GMM_alpha
             if par_index == 2:
                 get_next_par = get_next_GMM_bound
