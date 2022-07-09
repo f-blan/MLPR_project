@@ -190,10 +190,56 @@ class GMMLBG_Tied_Model(GMMLBG_Model):
             w = Z/X.shape[1]
             mu = vcol(F/Z)
             C = S/Z - np.dot(mu, mu.T)
-            if self.constrained:
-                U, s, _ = np.linalg.svd(C)
-                s[s<self.bound] = self.bound
-                C = np.dot(U, vcol(s)*U.T)
+            
+
+            nextGMM.append((w,mu,C, Z))
+
+        
+
+    
+        dim = nextGMM[0][2].shape[0]
+        sumC =np.zeros((dim, dim))
+        for i in range(0,len(nextGMM)):
+            sumC += nextGMM[i][3] *nextGMM[i][2]
+        
+
+        sumC = sumC/responsibilities.shape[1]
+
+        if self.constrained:
+            sumC = sumC/len(nextGMM)
+            U, s, _ = np.linalg.svd(sumC)
+            s[s<self.bound] = self.bound
+            sumC = np.dot(U, vcol(s)*U.T)
+
+        for i in range(0,len(nextGMM)):
+                
+            nextGMM[i] = (nextGMM[i][0],nextGMM[i][1], sumC )
+        
+        return nextGMM
+
+class GMMLBG_DT_Model(GMMLBG_Model):
+    def __init__(self, n_classes: int, stop_threshold: float, n_gauss_exp: int, alpha: float = 0.1, preProcess: PreProcess = PreProcess("None"), constrained: bool = True, verbose: bool = False, bound: float = 0.01):
+        super().__init__(n_classes, stop_threshold, n_gauss_exp, alpha, preProcess, constrained, verbose, bound=bound)
+    
+    def _get_next_params(self, responsibilities: np.ndarray, X: np.ndarray) -> List[Tuple[float, np.ndarray, np.ndarray]]:
+        nextGMM : List[Tuple[float, np.ndarray, np.ndarray, float]] = []
+        computed = False
+        
+        for g in range(0, responsibilities.shape[0]):
+            resp = responsibilities[g, :]
+            Z= resp.sum()
+            F= (vrow(resp)*X).sum(1)
+            S= np.dot(X, (vrow(resp)*X).T)
+            w = Z/X.shape[1]
+            mu = vcol(F/Z)
+            C = S/Z - np.dot(mu, mu.T)
+            
+            dim = C.shape[0]
+            m = np.zeros((dim, dim))
+            diag = np.diag(C)
+            positions = [i for i in range(0,dim)]
+            m[positions, positions] = diag[positions]
+            C=m
 
             nextGMM.append((w,mu,C, Z))
 
