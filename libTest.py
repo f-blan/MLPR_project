@@ -335,25 +335,26 @@ class LibTest():
 
     
     def test_GMM_LBG_Classify_T(self):
-        model = GMMLBG_Tied_Model(3, 1e-6,1)
+        model = GMMLBG_Tied_Model(3, 1e-6,1, bound = 0.5)
         model.train(self.DTR, self.LTR)
         acc, pred, S =model.predict(self.DTE,self.LTE)
         print(1-acc)
         
-        model = GMMLBG_Tied_Model(3, 1e-6,2)
+        model = GMMLBG_Tied_Model(3, 1e-6,2, bound=0.5)
         model.train(self.DTR, self.LTR)
         acc, pred, S =model.predict(self.DTE,self.LTE)
         print(1-acc)
 
-        model = GMMLBG_Tied_Model(3, 1e-6,3)
+        model = GMMLBG_Tied_Model(3, 1e-6,3, bound=0.5)
         model.train(self.DTR, self.LTR)
         acc, pred, S =model.predict(self.DTE,self.LTE)
         print(1-acc)
 
-        model = GMMLBG_Tied_Model(3, 1e-6,4)
+        model = GMMLBG_Tied_Model(3, 1e-6,4, bound=0.0001)
         model.train(self.DTR, self.LTR)
         acc, pred, S =model.predict(self.DTE,self.LTE)
         print(1-acc)
+        
     def test_GMM_LBG_Classify_D(self):
         model = GMMLBG_Diag_Model(3, 1e-6,1)
         model.train(self.DTR, self.LTR)
@@ -375,7 +376,7 @@ class LibTest():
         acc, pred, S =model.predict(self.DTE,self.LTE)
         print(1-acc)
     
-    def test_GMM_LBG_Classify_T(self):
+    def test_GMM_LBG_Classify_T2(self):
         model = GMMLBG_Tied_Model(3, 1e-6,1)
         model.train(self.DTR, self.LTR)
         acc, pred, S =model.predict(self.DTE,self.LTE)
@@ -742,14 +743,14 @@ if __name__ == "__main__":
     #testClass.test_GMM_LBG_ll()
     #testClass.test_GMM_LBG_Classify_FC()
     #testClass.test_GMM_LBG_Classify_D()
-    #testClass.test_GMM_LBG_Classify_T()
+    testClass.test_GMM_LBG_Classify_T()
     #testClass.test_BD_simple()
     #testClass.test_CM_comm()
     #testClass.test_BD_Opt()
     #testClass.test_BD_risks()
     #testClass.test_ROC()
     #testClass.test_BE_plot()
-    testClass.test_Gauss_Preproc()
+    #testClass.test_Gauss_Preproc()
     #testClass.test_best_pars_LR()
     #testClass.test_best_pars_SVML()
     #testClass.test_best_pars_SVMNL_Poly()

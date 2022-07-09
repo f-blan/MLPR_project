@@ -87,11 +87,13 @@ class GMMLBG_Model(Model):
         return gmm
     
     def train(self, X:np.ndarray, L:np.ndarray):
+        
         X, L = self.preProcess.learn(X, L)
         self.pars: List[List[Tuple[float, np.ndarray, np.ndarray]]] = []
 
         for i in range(0, self.n_classes):
             D = X[:, L == i]
+            
             #print(D)
             self.pars.append(self._train(D, np.zeros(1)))
             
@@ -177,7 +179,7 @@ class GMMLBG_Tied_Model(GMMLBG_Model):
         super().__init__(n_classes, stop_threshold, n_gauss_exp, alpha, preProcess, constrained, verbose, bound=bound)
     
     def _get_next_params(self, responsibilities: np.ndarray, X: np.ndarray) -> List[Tuple[float, np.ndarray, np.ndarray]]:
-        nextGMM : List[Tuple[float, np.ndarray, np.ndarray]] = []
+        nextGMM : List[Tuple[float, np.ndarray, np.ndarray, float]] = []
         computed = False
         
         for g in range(0, responsibilities.shape[0]):
@@ -187,29 +189,24 @@ class GMMLBG_Tied_Model(GMMLBG_Model):
             S= np.dot(X, (vrow(resp)*X).T)
             w = Z/X.shape[1]
             mu = vcol(F/Z)
-            
-            if computed == False:
-                tied_C = S/Z - np.dot(mu, mu.T)
-                computed = True
-            C = tied_C.copy()
-            
-                
-            dim = C.shape[0]
-            m = np.zeros((dim, dim))
-            diag = np.diag(C)
-            positions = [i for i in range(0,dim)]
-            m[positions, positions] = diag[positions]
-            C=m
-            
+            C = S/Z - np.dot(mu, mu.T)
+            if self.constrained:
+                U, s, _ = np.linalg.svd(C)
+                s[s<self.bound] = self.bound
+                C = np.dot(U, vcol(s)*U.T)
 
-            nextGMM.append((w,mu,C))
+            nextGMM.append((w,mu,C, Z))
+
         
 
     
         dim = nextGMM[0][2].shape[0]
         sumC =np.zeros((dim, dim))
         for i in range(0,len(nextGMM)):
-            sumC += nextGMM[i][1] *nextGMM[i][2]
+            sumC += nextGMM[i][3] *nextGMM[i][2]
+        
+
+        sumC = sumC/responsibilities.shape[1]
 
         if self.constrained:
             sumC = sumC/len(nextGMM)

@@ -1,6 +1,6 @@
 from src_lib import *
 from data import *
-from src_lib.GMM_Model import GMMLBG_Model, GMMLBG_Tied_Model
+from src_lib.GMM_Model import GMMLBG_Diag_Model, GMMLBG_Model, GMMLBG_Tied_Model
 from src_lib.SVM_Model import Kernel
 
 FOLDS = 5
@@ -137,6 +137,7 @@ class ExperimentsGMM:
         if VERBOSE:
             plot_vals(minDCFList, vals)
             plot_vals(accuracies, vals)
+            #0.0819 - 0.2300 - 0.2289
 
     def find_best_K_T_PCA8(self):
         
@@ -172,19 +173,104 @@ class ExperimentsGMM:
         accuracies = []
         preproc = Gaussianize()
         
-        model = GMMLBG_Tied_Model(2,1e-2, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        model = GMMLBG_Tied_Model(2,STOP_TH, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
         minDCFList.append(minDCFs)
         accuracies.append(accs)
 
-        model = GMMLBG_Tied_Model(2,1e-2, 1,preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        model = GMMLBG_Tied_Model(2,STOP_TH, 1,preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.female_app[0])
         minDCFList.append(minDCFs)
         accuracies.append(accs)
 
-        model = GMMLBG_Tied_Model(2,1e-2, 1, preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        model = GMMLBG_Tied_Model(2,STOP_TH, 1, preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.male_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        if VERBOSE:
+            plot_vals(minDCFList, vals)
+            plot_vals(accuracies, vals)
+    
+    def find_best_K_N_raw(self):
+        
+        minDCFList = []
+        accuracies = []
+        
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.female_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.male_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+        if VERBOSE:
+            plot_vals(minDCFList, vals)
+            plot_vals(accuracies, vals)
+            #0.0819 - 0.2300 - 0.2289
+
+    def find_best_K_T_PCA8(self):
+        
+        minDCFList = []
+        accuracies = []
+        preproc = PCA(8)
+        
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1,preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.female_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1, preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.male_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+        if VERBOSE:
+            plot_vals(minDCFList, vals)
+            plot_vals(accuracies, vals)
+
+    def plot_K_T_raw(self):
+        minDCFList = [[0.0666, 0.7166, 0.0783, 0.0863, 0.0926], [0.156, 0.1716, 0.2030, 0.2640, 0.2470]]
+    
+    def find_best_K_T_Gauss(self):
+        
+        minDCFList = []
+        accuracies = []
+        preproc = Gaussianize()
+        
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1,preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
+        kcv = KCV(model, 5)
+        minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.female_app[0])
+        minDCFList.append(minDCFs)
+        accuracies.append(accs)
+
+        model = GMMLBG_Diag_Model(2,STOP_TH, 1, preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.male_app[0])
         minDCFList.append(minDCFs)
@@ -203,4 +289,7 @@ if __name__ == "__main__":
     #exps.plot_K_FC_PCA8()
     exps.find_best_K_T_raw()
     exps.find_best_K_T_PCA8()
-    exps.find_best_K_FC_Gauss()
+    exps.find_best_K_T_Gauss()
+    #exps.find_best_K_N_raw()
+    #exps.find_best_K_N_PCA8()
+    #exps.find_best_K_N_Gauss()

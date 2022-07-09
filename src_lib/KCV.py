@@ -149,6 +149,8 @@ class KCV:
             accs.append(acc)
             minDCF, _ =w.compute_best_threshold_from_Scores(whole_S, L)
 
+            #print(f"{model.}")
+
             print(f"minDCF: {minDCF}, acc: {acc}")
             minDCFs.append(minDCF)
             
