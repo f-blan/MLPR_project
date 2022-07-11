@@ -6,6 +6,11 @@ from src_lib.LR_Model import LRBinary_Model
 from src_lib.Model import Model
 from src_lib.utils import vrow
 
+"""
+this is a mostly useless class, i had better plans for it but the way i implemented this (at the end of the development stage)
+made it unpractical to use it properly
+"""
+
 class C_Wrapper:
     def __init__(self, e_prior: float = 0.5):
         self.calibrator = LRBinary_Model(2, 0, rebalance=True, prior = np.array([1-e_prior, e_prior]))

@@ -9,3 +9,4 @@ from .LR_Model import *
 from .Discrete_Model import *
 from .BD_wrapper import *
 from .C_Wrapper import *
+from .Fusion_Model import *

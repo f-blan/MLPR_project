@@ -20,6 +20,8 @@ class ExperimentsCal:
 
         preproc = PCA(8)
         self.model2 = GMMLBG_Model(2,STOP_TH, 3, preProcess=preproc)
+
+        self.fusion = Fusio
     
     def find_act_DCF_primary(self):
 
