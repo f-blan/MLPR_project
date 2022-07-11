@@ -5,18 +5,27 @@ import itertools as itt
 from typing import List
 
 def myHistogram(data: np.ndarray,n_labels:int,labels:np.ndarray, bins: int=20):
-    colors = ["red", "green", "blue","yellow" , "gray", "orange"]
+    colors = ["red", "green", "blue","orange" , "gray", "orange"]
 
     for i in range(0,data.shape[0]):
         for j in range(0,n_labels):
             plt.hist(data[i, labels == j],bins=bins, density=True, color=colors[j],alpha=0.6, histtype='bar', rwidth=0.9)
         plt.show()
 
-def plot_vals(dataY: List[List[float]], dataX: List[float], logplot: bool = True):
-    colors = ["red", "green", "blue","yellow" , "gray", "orange"]
+def plot_vals(dataY: List[List[float]], dataX: List[float], logplot: bool = True, compare_mode: bool = True):
+    colors = ["red", "green", "blue","orange" , "gray", "yellow"]
+
+    plot_fun = plt.semilogx if logplot else plt.plot
 
     for i, app in enumerate(dataY):
-        plt.semilogx( dataX, app, color= colors[i])
+        if compare_mode == False:
+            plot_fun(dataX, app, color = colors[i])
+        else:
+            if i%2 == 0:
+                plot_fun(dataX, app, color = colors[i])
+            else:
+                plot_fun(dataX, app, color=colors[i-1], linestyle='dashed')
+
     
     plt.show()
 

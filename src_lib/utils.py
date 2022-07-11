@@ -1,6 +1,6 @@
 from cmath import sqrt
 import numpy as np
-
+import random as r
 
 def compute_Pearson_corr(D: np.ndarray):
     cov = get_covarianceCentered(D)
@@ -88,3 +88,21 @@ def vcol(vec: np.ndarray) -> np.ndarray:
     return vec.reshape((vec.size,1))
 def vrow(vec: np.ndarray) -> np.ndarray:
     return vec.reshape((1,vec.size))
+
+def shuffle_and_split_dataset(D: np.ndarray, L: np.ndarray):
+    shuffled_zip = list(([(D[i], L[i]) for i in range(0,L.shape[0])]))
+    length = len(shuffled_zip)
+    r.Random(5).shuffle(shuffled_zip)
+
+    half_length = int(length*0.8)
+
+    t_split = shuffled_zip[0: half_length]
+    v_split = shuffled_zip[ half_length :]
+
+        
+    t_S = np.array( list(map(lambda x: x[0],  t_split)))
+    t_L = np.array(list(map(lambda x: x[1], t_split)))
+    v_S = np.array(list(map(lambda x: x[0],  v_split)))
+    v_L = np.array(list(map(lambda x: x[1], v_split)))
+
+    return (t_S, t_L), (v_S, v_L) 

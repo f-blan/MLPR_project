@@ -86,10 +86,17 @@ class BD_Wrapper:
         predL = np.int32(llrs > th)
         labels = L
         m = np.zeros((self.n_classes, self.n_classes))
+        m[0,0] = ((predL == 0) * (L == 0)).sum()
+        m[0,1] = ((predL == 0) * (L == 1)).sum()
+        m[1,0] = ((predL == 1) * (L == 0)).sum()
+        m[1,1] = ((predL == 1) * (L == 1)).sum()
+        
+        """
         for i in range(0, L.shape[0]):
             labelx = int(labels[i])
             labely = int(predL[i])
             m[labely, labelx] += 1
+        """
         return m
 
 
@@ -177,6 +184,7 @@ class BD_Wrapper:
         for idx, p in enumerate(priorLogOdds):
             effectiveP = 1/(1+np.exp(-p))
             th = -np.log((effectiveP)/(1-effectiveP))
+            th = -p
             
             self.prior = np.array([(1-effectiveP), effectiveP])
             m = self.get_matrix_from_threshold(labels, llrs, th=th)
@@ -219,7 +227,7 @@ class BD_Wrapper:
             
 
             DCFs.append(self.get_norm_risk(m))
-            minDCFs.append(self.compute_best_threshold(D,L)[0])
+            minDCFs.append(self.compute_best_threshold_from_Scores(llrs,L)[0])
 
         self.prior = old_prior        
         
@@ -237,21 +245,4 @@ class BD_Wrapper:
         
         return priorLogOdds, DCFs, minDCFs
 
-    def checker(self, th: float = None) -> Tuple[float, np.ndarray]:
-        if th == None:
-            th = -np.log((self.prior[1]*self.C[0, 1])/(self.prior[0]*self.C[1,0]))
-        #print(llrs)
-        #print(llrs.shape)
-        llrs = np.load('commedia_llr_infpar.npy')
-        labels = np.load('commedia_labels_infpar.npy')
-        print(f"th: {th}")
-        
-        preds = llrs
-        i1 = llrs>th
-        i2 = llrs<=th
-        #print((i1==i2).sum())
-        #print((llrs<=th).sum())
-        preds[i1] = 1
-        preds[i2] = 0
-        acc = np.sum(preds == L)/L.shape[0]
-        return acc, preds
+    

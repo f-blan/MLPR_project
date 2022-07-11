@@ -110,37 +110,76 @@ class KCV:
         w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
         self.model = model
         acc, whole_S = self.crossValidate(D, L, VERBOSE)
+        (t_S, t_L), (v_S, v_L) = shuffle_and_split_dataset(whole_S, L)
 
-        shuffled_zip = zip(whole_S, L)
-        length = len(shuffled_zip)
-        r.Random(5).shuffle(shuffled_zip)
-
-        t_split = shuffled_zip[0: length/2]
-        v_split = shuffled_zip[ length/2: ]
-
-        _, best_th = w.compute_best_threshold_from_Scores(t_split[0], t_split[1])
-
+        _, best_th = w.compute_best_threshold_from_Scores(t_S, t_L)
         theory_th = w.get_theoretical_threshold()
         
-        minDCF, _ = w.compute_best_threshold_from_Scores(v_split[0], v_split[1])
+        minDCF, _ = w.compute_best_threshold_from_Scores(v_S, v_L)
 
-        confusion_m = w.get_matrix_from_threshold(v_split[1], v_split[0], theory_th)
+        confusion_m = w.get_matrix_from_threshold(v_L, v_S, theory_th)
         theory_actDCF = w.get_norm_risk(confusion_m)
 
-        confusion_m = w.get_matrix_from_threshold(v_split[1], v_split[0], best_th)
+        confusion_m = w.get_matrix_from_threshold(v_L, v_S, best_th)
         estimate_th_actDCF = w.get_norm_risk(confusion_m)
 
         return minDCF, theory_actDCF, estimate_th_actDCF, best_th
 
+    def calibrator_eval(self, model: Model, D:np.ndarray, L: np.ndarray, e_prior: float):
+        self.model = model
+        acc, whole_S = self.crossValidate(D, L, VERBOSE)
+        (t_S, t_L), (v_S, v_L) = shuffle_and_split_dataset(whole_S, L)
 
-        
+
+        cal_w = model.train_calibrator(t_S, t_L, e_prior, eval_mode= True)
+        calibrator: LRBinary_Model = cal_w.calibrator
+        _, __, cal_Scores_eval= calibrator.predict(v_S, v_L)
+
+        w=BD_Wrapper("Static", 2, e_prior=0.5, model=model)
+        theory_th = w.get_theoretical_threshold()
+        confusion_m = w.get_matrix_from_threshold(v_L, cal_Scores_eval, theory_th)
+        theory_actDCFb = w.get_norm_risk(confusion_m)
+
+        w=BD_Wrapper("Static", 2, e_prior=0.9, model=model)
+        theory_th = w.get_theoretical_threshold()
+        confusion_m = w.get_matrix_from_threshold(v_L, cal_Scores_eval, theory_th)
+        theory_actDCFf = w.get_norm_risk(confusion_m)
+
+        w=BD_Wrapper("Static", 2, e_prior=0.1, model=model)
+        theory_th = w.get_theoretical_threshold()
+        confusion_m = w.get_matrix_from_threshold(v_L, cal_Scores_eval, theory_th)
+        theory_actDCFm = w.get_norm_risk(confusion_m)
+
+        return theory_actDCFb, theory_actDCFf, theory_actDCFm
+
 
     def compute_bayes_pars(self, model: Model, D: np.ndarray, L: np.ndarray):
         w=BD_Wrapper("Static", 2, model=model)
         self.model = model
         acc, whole_S = self.crossValidate(D, L, VERBOSE)
 
-        return w.plot_Bayes_errors_from_scores(whole_S, L, plot= True)
+        return w.plot_Bayes_errors_from_scores(whole_S, L, plot= False)
+
+    def compute_calibrated_bayes_pars(self, model: Model, D:np.ndarray, L:np.ndarray):
+        w=BD_Wrapper("Static", 2, model=model)
+        self.model = model
+        acc, whole_S = self.crossValidate(D, L, VERBOSE)
+
+        #local training set and local eval set
+        (t_S, t_L), (v_S, v_L) = shuffle_and_split_dataset(whole_S, L)
+
+        #train calibrator with local training set
+        cal_w, _ = model.train_calibrator(t_S, t_L, 0.5, eval_mode= True)
+        calibrator: LRBinary_Model = cal_w.calibrator
+
+        #predict calibrated scores for local evaluation set
+        _, __, cal_Scores_eval= calibrator.predict(v_S, v_L)
+
+        #get bayes plot for both uncalibrated and calibrated local validation set
+        logOdds, calDCFs, minDCFs = w.plot_Bayes_errors_from_scores(cal_Scores_eval, v_L, plot= False)
+        _, uncDCFs, __ = w.plot_Bayes_errors_from_scores(v_S, v_L, plot= False)
+
+        return logOdds, calDCFs, uncDCFs, minDCFs
 
 
 
