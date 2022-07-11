@@ -61,7 +61,8 @@ class LRBinary_Model(Model):
     def predict(self, D: np.ndarray, L: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         D, L = self.preProcess.apply(D, L)
         wt= vcol(self.w).T
-        S=np.dot(wt, D) +self.b
+        is_one_dim= wt.shape[0] == 1 and wt.shape[1] == 1
+        S=np.dot(wt, D) +self.b if is_one_dim == False else wt*D + self.b
         preds = S>0
         true = L >0
         acc=np.sum(preds==true)/preds.shape[1]

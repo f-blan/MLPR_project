@@ -12,7 +12,7 @@ def myHistogram(data: np.ndarray,n_labels:int,labels:np.ndarray, bins: int=20):
             plt.hist(data[i, labels == j],bins=bins, density=True, color=colors[j],alpha=0.6, histtype='bar', rwidth=0.9)
         plt.show()
 
-def plot_vals(dataY: List[List[float]], dataX: List[float], logplot: bool = True, compare_mode: bool = True):
+def plot_vals(dataY: List[List[float]], dataX: List[float], logplot: bool = True, compare_mode: bool = False):
     colors = ["red", "green", "blue","orange" , "gray", "yellow"]
 
     plot_fun = plt.semilogx if logplot else plt.plot

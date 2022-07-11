@@ -709,6 +709,12 @@ class LibTest():
         print(DTR.std(1))
 
         myHistogram(DTR, 2, LTR)
+    
+    def test_cal(self):
+        model = MVG_Model(2, False, False)
+        kcv = KCV(model, 5)
+
+        kcv.calibrator_eval(model, self.DTRbin,self.LTRbin, 0.5)
 
         
         
@@ -749,7 +755,7 @@ if __name__ == "__main__":
     #testClass.test_BD_Opt()
     #testClass.test_BD_risks()
     #testClass.test_ROC()
-    testClass.test_BE_plot()
+    #testClass.test_BE_plot()
     #testClass.test_Gauss_Preproc()
     #testClass.test_best_pars_LR()
     #testClass.test_best_pars_SVML()
@@ -760,6 +766,7 @@ if __name__ == "__main__":
     #testClass.test_load_shuffle()
     #testClass.test_GAUSS_PCA()
     #testClass.test_Znorm()
+    testClass.test_cal()
 
     
 

@@ -121,8 +121,27 @@ class ExperimentsCal:
 
         if VERBOSE:
             print(f"result with logReg pi = 0.5 for varying applications: {actDCFbB} - {actDCFfB} - {actDCFmB}")
-            print(f"result with logReg pi = 0.5 for varying applications: {actDCFbF} - {actDCFfF} - {actDCFmF}")
-            print(f"result with logReg pi = 0.5 for varying applications: {actDCFbM} - {actDCFfM} - {actDCFmM}")
+            print(f"result with logReg pi = 0.9 for varying applications: {actDCFbF} - {actDCFfF} - {actDCFmF}")
+            print(f"result with logReg pi = 0.1 for varying applications: {actDCFbM} - {actDCFfM} - {actDCFmM}")
+    
+    def Bayes_plot_cal(self):
+        DCFsList = []
+        kcv = KCV(self.model1, 5)
+        lOdds, calDCFs, uncDCFs, minDCFs = kcv.compute_calibrated_bayes_pars(self.model1, self.DTR, self.LTR )
+
+        DCFsList.append(calDCFs)
+        DCFsList.append(minDCFs)
+        DCFsList.append(uncDCFs)
+        
+        """
+        kcv = KCV(self.model2, 5)
+        lOdds, DCFsS, minDCFsS = kcv.compute_calibrated_bayes_pars(self.model2, self.DTR, self.LTR )
+
+        DCFsList.append(DCFsS)
+        DCFsList.append(minDCFsS)
+        """
+        if VERBOSE:
+            plot_vals(DCFsList, lOdds,False, compare_mode=False)
 
 
 
@@ -136,5 +155,6 @@ if __name__ == "__main__":
     #exps.Bayes_plot()
     #exps.threshold_estimate_primary()
     #exps.threshold_estimate_secondary()
-    exps.calibration_primary()
+    #exps.calibration_primary()
+    exps.Bayes_plot_cal()
         

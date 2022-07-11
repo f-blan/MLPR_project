@@ -1,5 +1,6 @@
 from statistics import mode
 from src_lib.BD_wrapper import BD_Wrapper
+from src_lib.C_Wrapper import C_Wrapper
 from src_lib.LR_Model import LRBinary_Model
 from src_lib.MVG_Model import MVG_Model
 from src_lib.SVM_Model import SVMNL_Model, SVML_Model
@@ -130,9 +131,8 @@ class KCV:
         acc, whole_S = self.crossValidate(D, L, VERBOSE)
         (t_S, t_L), (v_S, v_L) = shuffle_and_split_dataset(whole_S, L)
 
-
-        cal_w = model.train_calibrator(t_S, t_L, e_prior, eval_mode= True)
-        calibrator: LRBinary_Model = cal_w.calibrator
+        cal_w = C_Wrapper(e_prior = e_prior)
+        calibrator, _ = cal_w.train(t_S, t_L, eval_mode = True)
         _, __, cal_Scores_eval= calibrator.predict(v_S, v_L)
 
         w=BD_Wrapper("Static", 2, e_prior=0.5, model=model)
@@ -169,8 +169,9 @@ class KCV:
         (t_S, t_L), (v_S, v_L) = shuffle_and_split_dataset(whole_S, L)
 
         #train calibrator with local training set
-        cal_w, _ = model.train_calibrator(t_S, t_L, 0.5, eval_mode= True)
-        calibrator: LRBinary_Model = cal_w.calibrator
+        cal_w = C_Wrapper(e_prior = 0.5)
+        calibrator, _ = cal_w.train(t_S, t_L, eval_mode = True)
+        _, __, cal_Scores_eval= calibrator.predict(v_S, v_L)
 
         #predict calibrated scores for local evaluation set
         _, __, cal_Scores_eval= calibrator.predict(v_S, v_L)
