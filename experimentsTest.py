@@ -361,12 +361,13 @@ class ExperimentsTest:
             print(f"act DCF for GMM T female: {f}")
             print(f"act DCF for GMM T male: {m}")
     
-    def calibration_actDCF(self, model: Model):
+    def calibration_actDCF(self):
         model = self.GMM_T
     
         calScores = self._get_Calibrated_test_Scores(model)
 
         w = BD_Wrapper(model, 2, e_prior=self.bal_app[0])
+        th = w.get_theoretical_threshold()
         m = w.get_matrix_from_threshold(self.LTE, calScores, th)
         actB = w.get_norm_risk(m)
 
@@ -375,7 +376,7 @@ class ExperimentsTest:
         m = w.get_matrix_from_threshold(self.LTE, calScores, th)
         actF = w.get_norm_risk(m)
 
-        w = BD_Wrapper(model, 2, e_prior=self.bal_app[0])
+        w = BD_Wrapper(model, 2, e_prior=self.male_app[0])
         th = w.get_theoretical_threshold()
         m = w.get_matrix_from_threshold(self.LTE, calScores, th)
         actM = w.get_norm_risk(m)
@@ -391,12 +392,38 @@ class ExperimentsTest:
         _, S = kcv.crossValidate(self.DTR, self.LTR)
 
         calibrator = cw.calibrator
-        calibrator.train(S, self.LTR)
-
+        calibrator.train(vrow(S), self.LTR)
+        
         model.train(self.DTR, self.LTR)
         _, _, ncScores = model.predict(self.DTE, self.LTE)
         _, __, calScores = calibrator.predict(ncScores, self.LTE)
         return calScores
+
+    def fusion_actDCF(self):
+        w= BD_Wrapper("static", 2)
+        self.fusion.mode = "fullTrain"
+        self.fusion.train(self.DTR, self.LTR)
+        _, __, scoreF = self.fusion.predict(self.DTE, self.LTE)
+
+        w= BD_Wrapper("static", 2, e_prior=self.bal_app[0])
+        th = w.get_theoretical_threshold()
+        mb =w.get_matrix_from_threshold(self.LTE, scoreF, th)
+        b = w.get_norm_risk(mb)
+
+        w= BD_Wrapper("static", 2, e_prior=self.female_app[0])
+        th = w.get_theoretical_threshold()
+        mf =w.get_matrix_from_threshold(self.LTE, scoreF, th)
+        f = w.get_norm_risk(mf)
+
+        w= BD_Wrapper("static", 2, e_prior=self.male_app[0])
+        th = w.get_theoretical_threshold()
+        mm =w.get_matrix_from_threshold(self.LTE, scoreF, th)
+        m = w.get_norm_risk(mm)
+
+        if VERBOSE:
+            print(f"act DCF for fusion bal : {b} - {(mb[1,1]+mb[0,0])/mb.sum()}")
+            print(f"act DCF for fusion bal : {f} - {(mf[1,1]+mf[0,0])/mf.sum()}")
+            print(f"act DCF for fusion bal : {m} - {(mm[1,1]+mm[0,0])/mm.sum()}")
 
     def compare_BPs_best_Models(self):
         DCFList = []
@@ -408,7 +435,8 @@ class ExperimentsTest:
         DCFList.append(actT)
 
         w= BD_Wrapper("static", 2)
-        scoreFC = self._get_Calibrated_test_Scores(self.GMM_FC)
+        self.GMM_FC.train(self.DTR, self.LTR)
+        scoreFC = self._predict_test_scores(self.GMM_FC)
         priorLogOdds, actFC, minFC = w.plot_Bayes_errors_from_scores(scoreFC, self.LTE, plot = False)
         DCFList.append(minFC)
         DCFList.append(actFC)
@@ -425,16 +453,6 @@ class ExperimentsTest:
             plot_vals(DCFList, priorLogOdds,False, compare_mode=True)
 
 
-
-
-
-
-        
-
-
-        
-
-
 if __name__ == "__main__":
     exps = ExperimentsTest("gend")
 
@@ -445,8 +463,12 @@ if __name__ == "__main__":
     #exps.test_SVMNL()
     #exps.test_SVML()
     #exps.test_GMM_FC()
-    exps.test_GMM_T()
-
+    #exps.test_GMM_T()
+    #exps.test_Fusion()
+    #exps.threshold_actDCF()
+    #exps.calibration_actDCF()
+    #exps.fusion_actDCF()
+    exps.compare_BPs_best_Models()
 
 
 

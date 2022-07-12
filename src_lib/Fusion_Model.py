@@ -108,7 +108,7 @@ class Fusion_Model(Model):
             th.join()
 
         if self.calibrate_after and self.mode != "crossVal":
-            self.predictedScores = self.all_calibrator.predict(self.predictedScores, L)
+            _,__, self.predictedScores = self.all_calibrator.predict(self.predictedScores, L)
             self.predictedScores.sum(axis = 0)
         
         #fuse models
