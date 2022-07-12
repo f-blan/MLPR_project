@@ -48,7 +48,6 @@ class LRBinary_Model(Model):
         self.nT = (L == 1).sum()
         self.nF = (L == 0).sum()
         if self.rebalance:
-            
             self.Dt = D[:,L == 1]
             self.Df = D[:,L == 0]
             #print(f"nT = {self.nT}, nF = {self.nF}, prior= {self.prior}")

@@ -2,6 +2,8 @@ from src_lib import *
 from data import *
 from src_lib.GMM_Model import GMMLBG_DT_Model, GMMLBG_Diag_Model, GMMLBG_Model, GMMLBG_Tied_Model
 from src_lib.SVM_Model import Kernel
+from src_lib.Fusion_Model import Fusion_Model
+
 
 FOLDS = 5
 VERBOSE = True
@@ -18,10 +20,13 @@ class ExperimentsCal:
 
         self.model1 = GMMLBG_Tied_Model(2,STOP_TH, 4)
 
-        preproc = PCA(8)
-        self.model2 = GMMLBG_Model(2,STOP_TH, 3, preProcess=preproc)
+        
+        self.model2 = GMMLBG_Model(2,STOP_TH, 3)
 
-        self.fusion = Fusio
+        kcv = KCV(None, 8)
+        self.fusionAfter = Fusion_Model(2,kcv, calibrate_after=True)
+        self.fusionAfter.add_model(self.model1, False)
+        self.fusionAfter.add_model(self.model2, False)
     
     def find_act_DCF_primary(self):
 
@@ -72,7 +77,7 @@ class ExperimentsCal:
         DCFsList.append(minDCFsS)
 
         if VERBOSE:
-            plot_vals(DCFsList, lOdds,False)
+            plot_vals(DCFsList, lOdds,False, compare_mode=True)
 
     def threshold_estimate_primary(self):
         DCFsList = []
@@ -146,6 +151,66 @@ class ExperimentsCal:
             plot_vals(DCFsList, lOdds,False, compare_mode=False)
 
 
+    def find_act_DCF_Fusion(self):
+        #these methods perform a kfold inside of a kfold
+
+        kcv = KCV(self.fusionAfter, 5)
+        minDCFb, actDCFb, best_thb, theory_thb = kcv.compute_min_actual_dcf_fusion(self.fusionAfter, self.DTR, self.LTR, self.bal_app[0])
+
+        kcv = KCV(self.model1, 5)
+        minDCFf, actDCFf, best_thf, theory_thf = kcv.compute_min_actual_dcf_fusion(self.fusionAfter, self.DTR, self.LTR, self.female_app[0])
+        
+        kcv = KCV(self.model1, 5)
+        minDCFm, actDCFm, best_thm, theory_thm = kcv.compute_min_actual_dcf_fusion(self.fusionAfter, self.DTR, self.LTR, self.male_app[0])
+
+
+        if VERBOSE:
+            print(f"act DCF for fusion model bal: {minDCFb} - {actDCFb} - {best_thb} - {theory_thb}")
+            print(f"act DCF for fusion model female: {minDCFf} - {actDCFf} - {best_thf} - {theory_thf}")
+            print(f"act DCF for fusion model male: {minDCFm} - {actDCFm} - {best_thm} - {theory_thm}")
+    
+    def plot_Bayes_Fusion(self):
+        self.fusionAfter.mode = "crossVal"
+        model = self.fusionAfter
+
+        t_S, t_L, v_S, v_L, S = model.train_calibrator(self.DTR, self.LTR, "crossVal")
+        w=BD_Wrapper("Static", 2, model=model)
+
+        _,_,v_S = model.all_calibrator.predict(v_S, v_L) 
+
+        lOdds, actDCFs, minDCFs = w.plot_Bayes_errors_from_scores(v_S, v_L, plot= False)
+        DCFsList = []
+        DCFsList.append(actDCFs)
+        DCFsList.append(minDCFs)
+        if VERBOSE:
+            plot_vals(DCFsList, lOdds,False, compare_mode=True)
+
+    def plot_Bayes_Fusion_vs_primary(self):
+        self.fusionAfter.mode = "crossVal"
+        model = self.fusionAfter
+
+        t_S, t_L, v_S, v_L, S = model.train_calibrator(self.DTR, self.LTR, "crossVal")
+        w=BD_Wrapper("Static", 2, model=model)
+
+        _,_,v_S = model.all_calibrator.predict(v_S, v_L) 
+
+        lOdds, actDCFs, minDCFs = w.plot_Bayes_errors_from_scores(v_S, v_L, plot= False)
+        DCFsList = []
+        DCFsList.append(actDCFs)
+        DCFsList.append(minDCFs)
+
+        kcv = KCV(self.model1, 5)
+        lOdds, calDCFs, uncDCFs, minDCFs = kcv.compute_calibrated_bayes_pars(self.model1, self.DTR, self.LTR )
+
+        DCFsList.append(calDCFs)
+        DCFsList.append(minDCFs)
+        DCFsList.append(uncDCFs)
+
+
+        if VERBOSE:
+            plot_vals(DCFsList, lOdds,False, compare_mode=False)
+
+
 
   
 
@@ -153,10 +218,13 @@ if __name__ == "__main__":
     exps = ExperimentsCal("gend")
 
     #exps.find_act_DCF_primary()
-    #exps.find_act_DCF_secondary()
-    #exps.Bayes_plot()
+    exps.find_act_DCF_secondary()
+    exps.Bayes_plot()
     #exps.threshold_estimate_primary()
-    #exps.threshold_estimate_secondary()
+    exps.threshold_estimate_secondary()
     #exps.calibration_primary()
-    exps.Bayes_plot_cal()
+    #exps.Bayes_plot_cal()
+    exps.find_act_DCF_Fusion()
+    exps.plot_Bayes_Fusion()
+    exps.plot_Bayes_Fusion_vs_primary()
         

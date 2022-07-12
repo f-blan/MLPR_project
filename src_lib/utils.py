@@ -89,8 +89,11 @@ def vcol(vec: np.ndarray) -> np.ndarray:
 def vrow(vec: np.ndarray) -> np.ndarray:
     return vec.reshape((1,vec.size))
 
-def shuffle_and_split_dataset(D: np.ndarray, L: np.ndarray):
-    shuffled_zip = list(([(D[i], L[i]) for i in range(0,L.shape[0])]))
+def shuffle_and_split_dataset(D: np.ndarray, L: np.ndarray, dims = 1):
+    if dims == 1:
+        shuffled_zip = list(([(D[i], L[i]) for i in range(0,L.shape[0])]))
+    else:
+        shuffled_zip = list(([(D[:, i], L[i]) for i in range(0,L.shape[0])]))
     length = len(shuffled_zip)
     r.Random(5).shuffle(shuffled_zip)
 
@@ -105,4 +108,4 @@ def shuffle_and_split_dataset(D: np.ndarray, L: np.ndarray):
     v_S = np.array(list(map(lambda x: x[0],  v_split)))
     v_L = np.array(list(map(lambda x: x[1], v_split)))
 
-    return (t_S, t_L), (v_S, v_L) 
+    return (t_S.T, t_L), (v_S.T, v_L) 

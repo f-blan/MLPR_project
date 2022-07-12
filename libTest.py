@@ -715,7 +715,17 @@ class LibTest():
         kcv = KCV(model, 5)
 
         kcv.calibrator_eval(model, self.DTRbin,self.LTRbin, 0.5)
-
+    
+    def test_Fusion(self):
+        kcv = KCV(None, 5)
+        model = Fusion_Model(2, kcv)
+        model.add_model(MVG_Model(2,False,False),False)
+        model.add_model(MVG_Model(2,True,False), False)
+        _,__,p,l,___=model.train_calibrator(self.DTRbin, self.LTRbin, "crossVal")
+        
+        _,__, cals = model.all_calibrator.predict(p, l)
+        print(cals)
+        print(l)
         
         
 
@@ -744,7 +754,7 @@ if __name__ == "__main__":
     #testClass.test_SVMNL_RBF()
     #testClass.test_SVMNL_Poly()
     #testClass.test_SVMNL_Poly_Reb()
-    #testClass.test_SVM_linear()
+    testClass.test_SVM_linear()
     #testClass.test_SVM_linear_Reb()
     #testClass.test_GMM_LBG_ll()
     #testClass.test_GMM_LBG_Classify_FC()
@@ -766,7 +776,8 @@ if __name__ == "__main__":
     #testClass.test_load_shuffle()
     #testClass.test_GAUSS_PCA()
     #testClass.test_Znorm()
-    testClass.test_cal()
+    #testClass.test_cal()
+    #testClass.test_Fusion()
 
     
 

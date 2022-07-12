@@ -26,14 +26,14 @@ class ExperimentsSVM:
         minDCFList.append(minDCFs)
         accuracies.append(accs)
         
-        model = SVML_Model(2, K, 0.1)
+        model = SVML_Model(2, KL, 0.1)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.female_app[0], n_vals=5)
         minDCFList.append(minDCFs)
         accuracies.append(accs)
 
         
-        model = SVML_Model(2, K, 0.1)
+        model = SVML_Model(2, KL, 0.1)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(-3, 3), e_prior=self.male_app[0], n_vals=5)
         minDCFList.append(minDCFs)
@@ -472,7 +472,7 @@ class ExperimentsSVM:
 if __name__ == "__main__":
     exps = ExperimentsSVM("gend")
 
-    #exps.find_best_C_L_raw()
+    exps.find_best_C_L_raw()
     #exps.plot_C_L()
     #exps.find_best_C_L_PCA8()
     #exps.find_best_C_L_Gauss()
@@ -491,4 +491,4 @@ if __name__ == "__main__":
     #exps.find_best_C_RBF_raw_male()
     #exps.find_best_C_RBF_PCA8_male()
     #exps.find_best_C_RBF_Gauss_bal()
-    exps.find_RBF_Gauss_mf_best_pars()
+    #exps.find_RBF_Gauss_mf_best_pars()

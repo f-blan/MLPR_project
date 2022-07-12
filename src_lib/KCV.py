@@ -1,6 +1,7 @@
 from statistics import mode
 from src_lib.BD_wrapper import BD_Wrapper
 from src_lib.C_Wrapper import C_Wrapper
+from src_lib.Fusion_Model import Fusion_Model
 from src_lib.LR_Model import LRBinary_Model
 from src_lib.MVG_Model import MVG_Model
 from src_lib.SVM_Model import SVMNL_Model, SVML_Model
@@ -56,7 +57,36 @@ class KCV:
     
         return (DTR, LTR), (parts[held_out][0], parts[held_out][1])
         
+    def crossValidateFusion(self, D: np.ndarray, L: np.ndarray, verbose:bool = False) -> float:
+        K = self.K
 
+        if self.LOO:
+            K = L.shape[0]
+
+        
+        parts = self._split_into_k(D, L, K)
+        tot_c = 0
+        tot_s = 0
+
+        whole_S = np.zeros((len(self.model.models), D.shape[1]))
+        whole_S_i = 0
+
+        for held_out in range(0, K):
+            (DTR, LTR), (DTE,LTE) = self._create_partition(parts, held_out)
+
+            self.model.train(DTR, LTR)
+
+            _, preds, S = self.model.predict(DTE, LTE)
+
+            
+            whole_S[:, whole_S_i : whole_S_i + S.shape[1]] = S
+            whole_S_i+=S.shape[1]
+            tot_c += (preds==LTE).sum()
+            tot_s += LTE.shape[0]
+        
+        
+        return tot_c/tot_s, whole_S
+    
     def crossValidate(self, D: np.ndarray, L: np.ndarray, verbose:bool = False) -> float:
         K = self.K
 
@@ -106,6 +136,25 @@ class KCV:
         actDcf = w.get_norm_risk(confusion_m)
 
         return actDcf, th
+    
+    def compute_min_actual_dcf_fusion(self, model: Fusion_Model, D: np.ndarray, L: np.ndarray, e_prior: float = 0.5, th: float = None):
+        #thematically closer with calibrator_eval and threshold_estimate (they use the same train and evaluation sets)
+        
+        self.model = model
+        model.mode = "crossVal"
+
+        t_S, t_L, v_S, v_L, S = model.train_calibrator(D, L, "crossVal")
+        w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
+
+        _,_,v_S = model.all_calibrator.predict(v_S, v_L) 
+        minDCF,best_th = w.compute_best_threshold_from_Scores(v_S, v_L)
+
+        theory_th = w.get_theoretical_threshold()
+        confusion_m = w.get_matrix_from_threshold(v_L, v_S, theory_th)
+        actDCF = w.get_norm_risk(confusion_m)
+
+        return minDCF, actDCF, best_th, theory_th
+
     
     def threshold_estimate(self, model: Model, D: np.ndarray, L: np.ndarray, e_prior: float = 0.5 ):
         w=BD_Wrapper("Static", 2, e_prior=e_prior, model=model)
@@ -185,7 +234,8 @@ class KCV:
 
 
     def find_best_par(self, model: Model, D: np.ndarray, L:np.ndarray, par_index: int, bounds: Tuple[float, float], logBounds: bool = True, logbase: float=10.0, e_prior: float = 0.5, verbose:bool = False, n_vals: int=20) -> Any:
-        
+        # I only realised later that i could have programmed this to compute DCFs for the three main applications at once
+        # would have been much cleaner and faster to perform experiments
         if(logBounds):
             par_vals = np.logspace(bounds[0], bounds[1], num=n_vals, base=logbase)
         else:
