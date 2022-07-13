@@ -109,7 +109,7 @@ class ExperimentsGMM:
 
     def plot_K_FC_Gauss(self):
         minDCFList = [[0.0530, 0.0456, 0.0486, 0.0560, 0.0656], [0.1373, 0.1246, 0.1246, 0.11416, 0.1956], [0.1703, 0.1283, 0.1286, 0.1450, 0.1930]]
-        vals = [ 2, 4, 8, 16, 32]
+        vals = [ 1, 2, 3, 4, 5]
         plot_vals(minDCFList, vals)
         
 
@@ -167,8 +167,9 @@ class ExperimentsGMM:
             plot_vals(accuracies, vals)
 
     def plot_K_T_PCA8(self):
-        minDCFList = [[0.0670, 0.0670, 0.0849, 0.0996, 0.0803],[0.1600, 0.1590, 0.0206, 0.2956,0.2066],[0.1413, 0.1353,0.1156,0.1100,0.1153]]
-
+        minDCFList = [[0.0670, 0.0670, 0.0849, 0.0996, 0.0803],[0.1600, 0.1590, 0.2060, 0.2956,0.2066],[0.1413, 0.1353,0.1156,0.1100,0.1153]]
+        vals = [ 1, 2, 3, 4, 5]
+        plot_vals(minDCFList, vals)
     
     def find_best_K_T_Gauss(self):
         
@@ -231,7 +232,7 @@ class ExperimentsGMM:
         minDCFList = []
         accuracies = []
         preproc = PCA(8)
-        
+        """
         model = GMMLBG_Diag_Model(2,STOP_TH, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.bal_app[0])
@@ -243,7 +244,7 @@ class ExperimentsGMM:
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.female_app[0])
         minDCFList.append(minDCFs)
         accuracies.append(accs)
-
+"""
         model = GMMLBG_Diag_Model(2,STOP_TH, 1, preProcess=preproc)#GMMLBG_Diag_Model(2,1e-3,3, bound=0.05)
         kcv = KCV(model, 5)
         minDCFs, vals, accs = kcv.find_best_par(model, self.DTR, self.LTR, 0,(1, 5), logbase=2, n_vals = 5, logBounds=False, e_prior=self.male_app[0])
@@ -253,8 +254,10 @@ class ExperimentsGMM:
             plot_vals(minDCFList, vals)
             plot_vals(accuracies, vals)
 
-    def plot_K_N_raw(self):
-        minDCFList = [[0.0666, 0.7166, 0.0783, 0.0863, 0.0926], [0.156, 0.1716, 0.2030, 0.2640, 0.2470]]
+    def plot_K_N_PCA8(self):
+        minDCFList = [[0.0666, 0.07166, 0.0783, 0.0863, 0.0926], [0.156, 0.1716, 0.2030, 0.2640, 0.2470], [0.1706,0.1703, 0.2343, 0.2680, 0.2873 ]]
+        vals = [ 1, 2, 3, 4, 5]
+        plot_vals(minDCFList, vals)
     
     def find_best_K_N_Gauss(self):
         
@@ -373,10 +376,12 @@ class ExperimentsGMM:
 if __name__ == "__main__":
     exps = ExperimentsGMM("gend")
 
-    exps.find_best_K_FC_raw()
+    #exps.find_best_K_FC_raw()
     #exps.find_best_K_FC_Gauss()
     #exps.find_best_K_FC_PCA8()
     #exps.plot_K_FC_PCA8()
+    #exps.plot_K_T_PCA8()
+    exps.plot_K_N_PCA8()
     #exps.find_best_K_T_raw()
     #exps.find_best_K_T_PCA8()
     #exps.find_best_K_T_Gauss()

@@ -468,11 +468,28 @@ class ExperimentsSVM:
             if VERBOSE:
                 plot_vals(minDCFList, vals)
                 plot_vals(accuracies, vals)
+    
+    def quadSVM_check(self):
+        kernel = Kernel(kname="poly2", c = 1)
+            
+        model = SVMNL_Model(2, 0, 20, kernel=kernel)
+        kcv = KCV(model, 5)
+        minDCF, _ = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcv.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_RAW: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_RAW: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_RAW: {minDCFm}, th: {_m}")
+
+
 
 if __name__ == "__main__":
     exps = ExperimentsSVM("gend")
 
-    exps.find_best_C_L_raw()
+    exps.quadSVM_check()
+    #exps.find_best_C_L_raw()
     #exps.plot_C_L()
     #exps.find_best_C_L_PCA8()
     #exps.find_best_C_L_Gauss()

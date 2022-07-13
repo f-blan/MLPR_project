@@ -386,12 +386,66 @@ class ExperimentsMVG:
 
 
 
+    def MVG_NT_raw(self):
+        model = MVG_Model(2, True, True)
+        kcvw = KCV(model, FOLDS)
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
 
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_RAW: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_RAW: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_RAW: {minDCFm}, th: {_m}")
+    
+    def MVG_NT_PCA8(self):
+        preproc = PCA(8)
+        model = MVG_Model(2, True, True, preProcess= preproc)
+        kcvw = KCV(model, FOLDS)
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
 
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_RAW: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_RAW: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_RAW: {minDCFm}, th: {_m}")
+    
+    def MVG_NT_Gauss(self):
+        preproc = Gaussianize()
+        model = MVG_Model(2, True, True, preProcess= preproc)
+        kcvw = KCV(model, FOLDS)
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_RAW: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_RAW: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_RAW: {minDCFm}, th: {_m}")
+    
+    def MVG_NT_ZNorm_PCA8(self):
+        preproc = Znorm()
+        preproc.addNext(PCA(8))
+        model = MVG_Model(2, True, True, preProcess= preproc)
+        kcvw = KCV(model, FOLDS)
+        minDCF, _ = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.bal_app[0])
+        minDCFf, _f = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.female_app[0])
+        minDCFm, _m = kcvw.compute_min_dcf(model, self.DTR, self.LTR, self.male_app[0])
+
+        if VERBOSE:
+            print(f"MINDCF for MVG_FC_RAW: {minDCF}, th: {_}")
+            print(f"MINDCF for female MVG_FC_RAW: {minDCFf}, th: {_f}")
+            print(f"MINDCF for male MVG_FC_RAW: {minDCFm}, th: {_m}")
 
 if __name__ == "__main__":
     exps = ExperimentsMVG("gend")
     
+    #exps.MVG_NT_raw()
+    #exps.MVG_NT_PCA8()
+    #exps.MVG_NT_Gauss()
+    exps.MVG_NT_ZNorm_PCA8()
+
     #exps.MVG_FC_Raw()
     #exps.MVG_FC_Z()
     #exps.MVG_FC_GAUSS()
@@ -415,4 +469,6 @@ if __name__ == "__main__":
     #exps.MVG_T_Z()
     #exps.MVG_T_Z_PCA_8()
     #exps.random_test()
+
+    
         

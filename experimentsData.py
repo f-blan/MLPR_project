@@ -56,6 +56,21 @@ class ExperimentsData:
         if VERBOSE:
             myHistogram(DTR, 2, LTR)
     
+    def plot_features_PCA12(self):
+        preProc = PCA(12)
+        DTR, LTR = preProc.learn(self.DTR, self.LTR)
+        #print(DTR)
+        if VERBOSE:
+            myHistogram(DTR, 2, LTR)
+    
+    def plot_features_ZPCA12(self):
+        preproc = Znorm()
+        preproc.addNext(PCA(8))
+        DTR, LTR = preproc.learn(self.DTR, self.LTR)
+        #print(DTR)
+        if VERBOSE:
+            myHistogram(DTR, 2, LTR)
+    
     def plot_features_Z(self):
         preProc = Znorm()
         DTR, LTR = preProc.learn(self.DTR, self.LTR)
@@ -147,6 +162,12 @@ if __name__ == "__main__":
     #exps.scatter_features_raw()
     #exps.scatter_features_Z()
     exps.scatter_features_PCA_ZvsR()
+    #exps.plot_features_Z()
+    #exps.plot_features_PCA12()
+    #exps.plot_features_ZPCA12()
+    #exps.plot_features_Gauss()
     #exps.plot_features_raw()
     #exps.plot_RawvsZ()
+    #exps.plot_correlation_mat()
+    #exps.plot_correlation_gauss()
     

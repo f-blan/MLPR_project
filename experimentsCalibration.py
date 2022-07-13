@@ -204,11 +204,11 @@ class ExperimentsCal:
 
         DCFsList.append(calDCFs)
         DCFsList.append(minDCFs)
-        DCFsList.append(uncDCFs)
+        #DCFsList.append(uncDCFs)
 
 
         if VERBOSE:
-            plot_vals(DCFsList, lOdds,False, compare_mode=False)
+            plot_vals(DCFsList, lOdds,False, compare_mode=True)
 
 
 
@@ -218,13 +218,13 @@ if __name__ == "__main__":
     exps = ExperimentsCal("gend")
 
     #exps.find_act_DCF_primary()
-    exps.find_act_DCF_secondary()
-    exps.Bayes_plot()
+    #exps.find_act_DCF_secondary()
+    #exps.Bayes_plot()
     #exps.threshold_estimate_primary()
-    exps.threshold_estimate_secondary()
+    #exps.threshold_estimate_secondary()
     #exps.calibration_primary()
     #exps.Bayes_plot_cal()
-    exps.find_act_DCF_Fusion()
-    exps.plot_Bayes_Fusion()
+    #exps.find_act_DCF_Fusion()
+    #exps.plot_Bayes_Fusion()
     exps.plot_Bayes_Fusion_vs_primary()
         

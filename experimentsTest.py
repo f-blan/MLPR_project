@@ -237,6 +237,21 @@ class ExperimentsTest:
             print(f"minDCF for RBF SVM male app: {m}")
             plot_vals(DCFList, par_vals)
 
+    def test_SVMNL_gamma(self):
+        par_vals = [0.001, 0.01, 0.1]
+        def change_fun(x: int, model: SVMNL_Model):
+            model.kernel.gamma = par_vals[x]
+        
+        b, f, m = self._compute_minDCF_all_apps(self.SVM)
+        DCFList = self._dcf_over_different_pars(self.SVM, change_fun, 3)
+        
+        if VERBOSE:
+            print("raw")
+            print(f"minDCF for RBF SVM bal app: {b}")
+            print(f"minDCF for RBF SVM female app: {f}")
+            print(f"minDCF for RBF SVM male app: {m}")
+            plot_vals(DCFList, par_vals)
+
     def test_SVML(self):
         par_vals = np.logspace(-3, 3, num=5, base=10)
         def change_fun(x: int, model: SVML_Model):
@@ -361,6 +376,55 @@ class ExperimentsTest:
             print(f"act DCF for GMM T female: {f}")
             print(f"act DCF for GMM T male: {m}")
     
+    def GMMFC_theoryDCF(self):
+        self.GMM_FC.train(self.DTR, self.LTR)
+        _,__,scores = self.GMM_FC.predict(self.DTE,self.LTE)
+
+        w = BD_Wrapper("Static", 2, e_prior= self.bal_app[0])
+        th = w.get_theoretical_threshold()
+        m= w.get_matrix_from_threshold(self.LTE, scores, th)
+        b = w.get_norm_risk(m)
+
+        w = BD_Wrapper("Static", 2, e_prior= self.female_app[0])
+        th = w.get_theoretical_threshold()
+        m= w.get_matrix_from_threshold(self.LTE, scores, th)
+        f = w.get_norm_risk(m)
+
+        w = BD_Wrapper("Static", 2, e_prior= self.male_app[0])
+        th = w.get_theoretical_threshold()
+        m= w.get_matrix_from_threshold(self.LTE, scores, th)
+        m = w.get_norm_risk(m)
+        
+        if VERBOSE:
+            print(f"theory DCF for GMM FC bal: {b}")
+            print(f"theory DCF for GMM FC female: {f}")
+            print(f"theory DCF for GMM FC male: {m}")
+    
+    def GMMT_theoryDCF(self):
+        self.GMM_T.train(self.DTR, self.LTR)
+        _,__,scores = self.GMM_T.predict(self.DTE,self.LTE)
+
+        w = BD_Wrapper("Static", 2, e_prior= self.bal_app[0])
+        th = w.get_theoretical_threshold()
+        m= w.get_matrix_from_threshold(self.LTE, scores, th)
+        b = w.get_norm_risk(m)
+
+        w = BD_Wrapper("Static", 2, e_prior= self.female_app[0])
+        th = w.get_theoretical_threshold()
+        m= w.get_matrix_from_threshold(self.LTE, scores, th)
+        f = w.get_norm_risk(m)
+
+        w = BD_Wrapper("Static", 2, e_prior= self.male_app[0])
+        th = w.get_theoretical_threshold()
+        m= w.get_matrix_from_threshold(self.LTE, scores, th)
+        m = w.get_norm_risk(m)
+        
+        if VERBOSE:
+            print(f"theory DCF for GMM FC bal: {b}")
+            print(f"theory DCF for GMM FC female: {f}")
+            print(f"theory DCF for GMM FC male: {m}")
+        
+    
     def calibration_actDCF(self):
         model = self.GMM_T
     
@@ -461,15 +525,17 @@ if __name__ == "__main__":
     #exps.test_LR()
     #exps.test_QuadLR()
     #exps.test_SVMNL()
+    #exps.test_SVMNL_gamma()
     #exps.test_SVML()
     #exps.test_GMM_FC()
     #exps.test_GMM_T()
     #exps.test_Fusion()
     #exps.threshold_actDCF()
+    exps.GMMFC_theoryDCF()
+    exps.GMMT_theoryDCF()
     #exps.calibration_actDCF()
     #exps.fusion_actDCF()
-    exps.compare_BPs_best_Models()
-
+    #
 
 
 
